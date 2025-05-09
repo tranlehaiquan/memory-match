@@ -1,15 +1,13 @@
-import { useState } from 'react'
-import './App.css'
+import { GameBoard } from './components/GameBoard';
+import './App.css';
 
 function App() {
   return (
     <div className="app">
       <h1>Memory Match Game</h1>
-      <div className="game-container">
-        {/* Game content will go here */}
-      </div>
+      <GameBoard />
     </div>
-  )
+  );
 }
 
-export default App 
+export default App; 
