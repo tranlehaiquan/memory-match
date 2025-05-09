@@ -1,22 +1,26 @@
 import { useAuthStore } from '../store/authStore';
 
 export const UserProfile = () => {
-  const user = useAuthStore((state) => state.user);
+  const username = useAuthStore((state) => state.username);
+  const highScore = useAuthStore((state) => state.highScore);
   const logout = useAuthStore((state) => state.logout);
 
-  if (!user) return null;
-
   return (
-    <div className="absolute top-4 right-4 bg-white p-4 rounded-lg shadow-md">
-      <div className="flex items-center gap-4">
-        <div>
-          <p className="text-sm text-gray-600">Welcome,</p>
-          <p className="font-bold">{user.username}</p>
-          <p className="text-sm text-gray-600">High Score: {user.highScore}</p>
+    <div className="flex justify-between items-center mb-3 px-1 text-sm">
+      <div className="flex items-center gap-2">
+        <div className="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-semibold">
+          {username.charAt(0).toUpperCase()}
         </div>
-        <button
+        <span className="font-medium text-gray-700">{username}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded text-blue-700">
+          <span className="font-medium">High Score:</span>
+          <span>{highScore}</span>
+        </div>
+        <button 
           onClick={logout}
-          className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition-colors"
+          className="bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded text-xs font-medium transition-colors"
         >
           Logout
         </button>

@@ -13,11 +13,18 @@ function App() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 p-5 relative">
-      <h1 className="text-blue-700 mb-8 text-center font-black text-4xl shadow-text">
-        Memory Match Game
-      </h1>
-      <Outlet />
+    <div className="w-full h-screen overflow-hidden flex flex-col bg-gradient-to-br from-blue-50 to-purple-50">
+      <header className="w-full py-4 flex-shrink-0">
+        <h1 className="text-blue-700 text-center font-black text-3xl tracking-tight">
+          Memory Match Game
+        </h1>
+      </header>
+      
+      <main className="w-full flex-1 overflow-hidden px-4 pb-4">
+        <div className="w-full h-full max-w-5xl mx-auto">
+          <Outlet />
+        </div>
+      </main>
     </div>
   );
 }

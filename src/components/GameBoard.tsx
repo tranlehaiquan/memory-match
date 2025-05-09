@@ -7,7 +7,7 @@ import { GameOverlay } from "./GameOverlay";
 import { UserProfile } from "./UserProfile";
 import { PlayRecords } from "./PlayRecords";
 import { generateCards, checkMatch, isGameComplete } from "../utils/gameUtils";
-import { GameState } from "../types/game";
+import { GameState, GameDifficulty } from "../types/game";
 import { useAuthStore } from "../store/authStore";
 import { useTimerStore } from "../store/timerStore";
 import { useRecordsStore } from "../store/recordsStore";
@@ -28,14 +28,23 @@ export const GameBoard = () => {
     isGameOver: false,
     flippedCards: [],
     status: "idle",
+    difficulty: "easy",
   });
 
   const updateHighScore = useAuthStore((state) => state.updateHighScore);
 
+  const handleDifficultyChange = (difficulty: GameDifficulty) => {
+    setGameState((prev) => ({
+      ...prev,
+      difficulty,
+      cards: generateCards(difficulty),
+    }));
+  };
+
   const handleStartGame = () => {
     setGameState((prev) => ({
       ...prev,
-      cards: generateCards(),
+      cards: generateCards(prev.difficulty),
       status: "playing",
       score: 0,
       moves: 0,
@@ -64,18 +73,20 @@ export const GameBoard = () => {
       moves: gameState.moves,
       timeElapsed: elapsedTime,
       won: gameState.score > 0,
+      difficulty: gameState.difficulty,
     });
     updateHighScore(gameState.score);
   };
 
   const resetGame = () => {
     setGameState({
-      cards: generateCards(),
+      cards: generateCards(gameState.difficulty),
       score: 0,
       moves: 0,
       isGameOver: false,
       flippedCards: [],
       status: "idle",
+      difficulty: gameState.difficulty,
     });
     resetTimer();
   };
@@ -138,8 +149,21 @@ export const GameBoard = () => {
 
   const isWinner = gameState.status === "ended" && gameState.score > 0;
 
+  const getDifficultyGridCols = () => {
+    switch (gameState.difficulty) {
+      case 'easy':
+        return 'grid-cols-2 sm:grid-cols-4';
+      case 'medium':
+        return 'grid-cols-3 sm:grid-cols-6';
+      case 'hard':
+        return 'grid-cols-3 sm:grid-cols-6';
+      default:
+        return 'grid-cols-2 sm:grid-cols-4';
+    }
+  };
+
   return (
-    <>
+    <div className="w-full h-full relative overflow-hidden">
       <GameOverlay
         status={gameState.status}
         score={gameState.score}
@@ -147,99 +171,158 @@ export const GameBoard = () => {
         onPlayAgain={gameState.status === "ended" ? resetGame : handleStartGame}
       />
 
-      <div className={`w-full max-w-[1200px] ${gameState.status === "idle" ? "grid grid-cols-1 md:grid-cols-2 gap-8" : ""} p-4`}>
-        {gameState.status === "idle" && (
-          <div className="w-full">
+      {gameState.status === "idle" ? (
+        <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden">
+          <div className="w-full h-full min-h-0 overflow-hidden order-2 lg:order-1 lg:pr-2">
             <PlayRecords />
           </div>
-        )}
 
-        <div className={`w-full ${gameState.status === "idle" ? "max-w-[800px]" : "max-w-[1000px] mx-auto"} grid gap-4 p-4 bg-white/10 rounded-lg`}>
+          <div className="w-full h-full min-h-0 order-1 lg:order-2 lg:pl-2">
+            <div className="w-full h-full bg-white rounded-xl shadow-md p-4 overflow-auto">
+              <UserProfile />
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center p-4 mt-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl shadow-inner"
+              >
+                <h2 className="text-2xl font-bold mb-3 text-blue-700">
+                  Ready to Play?
+                </h2>
+                <p className="text-gray-600 mb-4 text-md">Match all the cards to win!</p>
+                
+                <div className="mb-5 w-full max-w-xs">
+                  <h3 className="text-md font-semibold text-gray-700 mb-2 text-center">Select Difficulty</h3>
+                  <div className="flex justify-between gap-2">
+                    <button
+                      onClick={() => handleDifficultyChange('easy')}
+                      className={`px-3 py-2 rounded text-sm font-medium flex-1 transition-colors ${
+                        gameState.difficulty === 'easy'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                      }`}
+                    >
+                      Easy
+                    </button>
+                    <button
+                      onClick={() => handleDifficultyChange('medium')}
+                      className={`px-3 py-2 rounded text-sm font-medium flex-1 transition-colors ${
+                        gameState.difficulty === 'medium'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                      }`}
+                    >
+                      Medium
+                    </button>
+                    <button
+                      onClick={() => handleDifficultyChange('hard')}
+                      className={`px-3 py-2 rounded text-sm font-medium flex-1 transition-colors ${
+                        gameState.difficulty === 'hard'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                      }`}
+                    >
+                      Hard
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1 text-center">
+                    {gameState.difficulty === 'easy' 
+                      ? '16 cards (8 pairs)' 
+                      : gameState.difficulty === 'medium' 
+                        ? '24 cards (12 pairs)' 
+                        : '36 cards (18 pairs)'}
+                  </p>
+                </div>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleStartGame}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-md font-semibold shadow transition-colors"
+                >
+                  Start Game
+                </motion.button>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="w-full h-full overflow-auto bg-white rounded-xl shadow-md p-4">
           <UserProfile />
-          {gameState.status === "idle" ? (
+          
+          <div className="flex flex-col items-center gap-4 mb-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="flex flex-wrap justify-center gap-3 p-3 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl shadow-inner w-full"
+              >
+                <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm">
+                  <span className="text-gray-600 font-medium">Score:</span>
+                  <motion.span
+                    key={gameState.score}
+                    initial={{ scale: 1.5 }}
+                    animate={{ scale: 1 }}
+                    className="text-lg font-bold text-blue-600"
+                  >
+                    {gameState.score}
+                  </motion.span>
+                </div>
+                <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm">
+                  <span className="text-gray-600 font-medium">Moves:</span>
+                  <motion.span
+                    key={gameState.moves}
+                    initial={{ scale: 1.5 }}
+                    animate={{ scale: 1 }}
+                    className="text-lg font-bold text-blue-600"
+                  >
+                    {gameState.moves}
+                  </motion.span>
+                </div>
+                <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm">
+                  <Timer />
+                </div>
+                <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm">
+                  <span className="text-gray-600 font-medium">Difficulty:</span>
+                  <span className="text-lg font-bold text-blue-600 capitalize">
+                    {gameState.difficulty}
+                  </span>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+            
+            <GameControls
+              status={gameState.status}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              onEnd={handleEnd}
+              onReset={resetGame}
+            />
+          </div>
+
+          <AnimatePresence mode="wait">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-md"
+              exit={{ opacity: 0, y: 20 }}
+              className={`grid ${getDifficultyGridCols()} gap-3 mx-auto`}
+              style={{ 
+                maxWidth: gameState.difficulty === 'easy' ? '450px' : 
+                          gameState.difficulty === 'medium' ? '650px' : '800px' 
+              }}
             >
-              <h2 className="text-3xl font-bold mb-4 text-gray-800">
-                Ready to Play?
-              </h2>
-              <p className="text-gray-600 mb-6">Match all the cards to win!</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleStartGame}
-                className="bg-green-500 text-white px-8 py-3 rounded-lg text-lg font-semibold"
-              >
-                Start Game
-              </motion.button>
-            </motion.div>
-          ) : (
-            <>
-              <div className="flex flex-col items-center gap-4 mb-5">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="flex items-center gap-8 p-4 bg-white rounded-lg shadow-md"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600 font-medium">Score:</span>
-                      <motion.span
-                        key={gameState.score}
-                        initial={{ scale: 1.5 }}
-                        animate={{ scale: 1 }}
-                        className="text-2xl font-bold text-gray-900"
-                      >
-                        {gameState.score}
-                      </motion.span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600 font-medium">Moves:</span>
-                      <motion.span
-                        key={gameState.moves}
-                        initial={{ scale: 1.5 }}
-                        animate={{ scale: 1 }}
-                        className="text-2xl font-bold text-gray-900"
-                      >
-                        {gameState.moves}
-                      </motion.span>
-                    </div>
-                    <Timer />
-                  </motion.div>
-                </AnimatePresence>
-                
-                <GameControls
-                  status={gameState.status}
-                  onPlay={handlePlay}
-                  onPause={handlePause}
-                  onEnd={handleEnd}
-                  onReset={resetGame}
+              {gameState.cards.map((card) => (
+                <Card
+                  key={card.id}
+                  card={card}
+                  onClick={() => handleCardClick(card.id)}
                 />
-              </div>
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className="grid grid-cols-4 gap-2.5 max-w-[500px] mx-auto"
-                >
-                  {gameState.cards.map((card) => (
-                    <Card
-                      key={card.id}
-                      card={card}
-                      onClick={() => handleCardClick(card.id)}
-                    />
-                  ))}
-                </motion.div>
-              </AnimatePresence>
-            </>
-          )}
+              ))}
+            </motion.div>
+          </AnimatePresence>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 };

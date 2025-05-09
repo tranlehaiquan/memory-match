@@ -5,6 +5,8 @@ export interface Card {
   isMatched: boolean;
 }
 
+export type GameDifficulty = 'easy' | 'medium' | 'hard';
+
 export interface GameState {
   cards: Card[];
   score: number;
@@ -12,6 +14,7 @@ export interface GameState {
   isGameOver: boolean;
   flippedCards: number[];
   status: 'idle' | 'playing' | 'paused' | 'ended';
+  difficulty: GameDifficulty;
 }
 
 export interface PlayRecord {
@@ -22,4 +25,5 @@ export interface PlayRecord {
   timeElapsed: number;
   completedAt: string;
   won: boolean;
+  difficulty?: GameDifficulty;
 } 
