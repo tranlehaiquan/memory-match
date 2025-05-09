@@ -1,0 +1,1538 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+TITLE: Passing and Reading Props in React Components
+DESCRIPTION: Shows how to pass props from a parent component to a child component and how to read those props in the child component.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/passing-props-to-a-component.md#2025-04-22_snippet_1
+
+LANGUAGE: JavaScript
+CODE:
+```
+function Avatar({ person, size }) {
+  return (
+    <img
+      className="avatar"
+      src={getImageUrl(person)}
+      alt={person.name}
+      width={size}
+      height={size}
+    />
+  );
+}
+
+export default function Profile() {
+  return (
+    <div>
+      <Avatar
+        size={100}
+        person={{ 
+          name: 'Katsuko Saruhashi', 
+          imageId: 'YfeOqp2'
+        }}
+      />
+      <Avatar
+        size={80}
+        person={{
+          name: 'Aklilu Lemma', 
+          imageId: 'OKS67lh'
+        }}
+      />
+      <Avatar
+        size={50}
+        person={{ 
+          name: 'Lin Lanying',
+          imageId: '1bX5QH6'
+        }}
+      />
+    </div>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Albums Component with Data Fetching
+DESCRIPTION: Component that fetches and displays artist albums using React's use hook with Suspense.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/Suspense.md#2025-04-22_snippet_16
+
+LANGUAGE: javascript
+CODE:
+```
+import {use} from 'react';
+import { fetchData } from './data.js';
+
+export default function Albums({ artistId }) {
+  const albums = use(fetchData(`/${artistId}/albums`));
+  return (
+    <ul>
+      {albums.map(album => (
+        <li key={album.id}>
+          {album.title} ({album.year})
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Clock Component with Color and Time Props in React
+DESCRIPTION: A React component that displays the current time with a configurable color. The component receives color and time as props and renders them in an h1 element with the specified styling.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/passing-props-to-a-component.md#2025-04-22_snippet_5
+
+LANGUAGE: jsx
+CODE:
+```
+export default function Clock({ color, time }) {
+  return (
+    <h1 style={{ color: color }}>
+      {time}
+    </h1>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Conditional Rendering with Logical AND Operator in React
+DESCRIPTION: Using the logical AND (&&) operator to conditionally render content only when a condition is true. This approach is often used when you want to render something or nothing based on a condition.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/conditional-rendering.md#2025-04-22_snippet_7
+
+LANGUAGE: JavaScript
+CODE:
+```
+return (
+  <li className="item">
+    {name} {isPacked && '✅'}
+  </li>
+);
+```
+
+----------------------------------------
+
+TITLE: Fixed React Request Counter with Updater Functions
+DESCRIPTION: Corrected implementation using updater functions to properly handle async state updates and prevent race conditions.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/queueing-a-series-of-state-updates.md#2025-04-22_snippet_6
+
+LANGUAGE: javascript
+CODE:
+```
+import { useState } from 'react';
+
+export default function RequestTracker() {
+  const [pending, setPending] = useState(0);
+  const [completed, setCompleted] = useState(0);
+
+  async function handleClick() {
+    setPending(p => p + 1);
+    await delay(3000);
+    setPending(p => p - 1);
+    setCompleted(c => c + 1);
+  }
+
+  return (
+    <>
+      <h3>
+        Pending: {pending}
+      </h3>
+      <h3>
+        Completed: {completed}
+      </h3>
+      <button onClick={handleClick}>
+        Buy     
+      </button>
+    </>
+  );
+}
+
+function delay(ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
+```
+
+----------------------------------------
+
+TITLE: Using Fragment Shorthand in JSX
+DESCRIPTION: Demonstrates the shorthand syntax for React.Fragment, which allows grouping of multiple JSX nodes without adding extra DOM elements.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/components.md#2025-04-22_snippet_0
+
+LANGUAGE: JSX
+CODE:
+```
+<>...</>
+```
+
+----------------------------------------
+
+TITLE: Basic useState Hook Syntax
+DESCRIPTION: The fundamental syntax for using the useState Hook in React, showing the destructuring pattern that returns the current state and a setter function.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useState.md#2025-04-22_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const [state, setState] = useState(initialState)
+```
+
+----------------------------------------
+
+TITLE: Creating a Custom Hook for Data Fetching in React
+DESCRIPTION: This snippet demonstrates how to create a custom hook 'useData' for data fetching, which encapsulates the fetching logic and handles race conditions. It also shows how to use this custom hook in a component.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/you-might-not-need-an-effect.md#2025-04-23_snippet_17
+
+LANGUAGE: javascript
+CODE:
+```
+function SearchResults({ query }) {
+  const [page, setPage] = useState(1);
+  const params = new URLSearchParams({ query, page });
+  const results = useData(`/api/search?${params}`);
+
+  function handleNextPageClick() {
+    setPage(page + 1);
+  }
+  // ...
+}
+
+function useData(url) {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    let ignore = false;
+    fetch(url)
+      .then(response => response.json())
+      .then(json => {
+        if (!ignore) {
+          setData(json);
+        }
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [url]);
+  return data;
+}
+```
+
+----------------------------------------
+
+TITLE: Displaying Data Variables in JSX
+DESCRIPTION: Shows how to embed JavaScript variables in JSX using curly braces to display dynamic content to users.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/index.md#2025-04-22_snippet_6
+
+LANGUAGE: javascript
+CODE:
+```
+return (
+  <h1>
+    {user.name}
+  </h1>
+);
+```
+
+----------------------------------------
+
+TITLE: Rendering a Dynamic List with Keys in React (JavaScript)
+DESCRIPTION: This JavaScript snippet defines a React component that receives a list of people from a data module, maps over each person to generate a list of components, and uses a utility function to generate image URLs. It demonstrates the use of keys for list items, proper React rendering flows, and importing dependencies between modules. Required dependencies: React, external modules (data.js and utils.js) providing the people array and getImageUrl helper. Accepts no props, returns an article with rendered content, and expects the people array to be valid and non-empty.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/describing-the-ui.md#2025-04-22_snippet_6
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { people } from './data.js';\nimport { getImageUrl } from './utils.js';\n\nexport default function List() {\n  const listItems = people.map(person =>\n    <li key={person.id}>\n      <img\n        src={getImageUrl(person)}\n        alt={person.name}\n      />\n      <p>\n        <b>{person.name}:</b>\n        {' ' + person.profession + ' '}\n        known for {person.accomplishment}\n      </p>\n    </li>\n  );\n  return (\n    <article>\n      <h1>Scientists</h1>\n      <ul>{listItems}</ul>\n    </article>\n  );\n}
+```
+
+----------------------------------------
+
+TITLE: Rendering Lists with map() in React
+DESCRIPTION: Shows how to transform an array of data into React elements using the JavaScript map() function, with proper key attributes for list items.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/index.md#2025-04-22_snippet_13
+
+LANGUAGE: javascript
+CODE:
+```
+const listItems = products.map(product =>
+  <li key={product.id}>
+    {product.title}
+  </li>
+);
+
+return (
+  <ul>{listItems}</ul>
+);
+```
+
+----------------------------------------
+
+TITLE: Handling Click Events to Update State - JavaScript
+DESCRIPTION: Illustrates a function that updates a state variable using its setter function. The handleClick function, when triggered by a user action, increments the current index, causing the component to re-render with updated state.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/state-a-components-memory.md#2025-04-22_snippet_4
+
+LANGUAGE: JavaScript
+CODE:
+```
+function handleClick() {
+  setIndex(index + 1);
+}
+```
+
+----------------------------------------
+
+TITLE: Basic React Component Definition
+DESCRIPTION: Demonstrates how to create a simple React component that renders an image, including the export statement and JSX markup.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/your-first-component.md#2025-04-22_snippet_2
+
+LANGUAGE: javascript
+CODE:
+```
+export default function Profile() {
+  return (
+    <img
+      src="https://i.imgur.com/MK3eW3Am.jpg"
+      alt="Katherine Johnson"
+    />
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Basic React Component Creation
+DESCRIPTION: Shows a simple example of creating and exporting a React component that renders a congratulatory message.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/your-first-component.md#2025-04-22_snippet_7
+
+LANGUAGE: javascript
+CODE:
+```
+export default function Congratulations() {
+  return (
+    <h1>Good job!</h1>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Declaring and Initializing State Variables
+DESCRIPTION: Example showing how to declare and initialize state variables with the useState Hook. Uses array destructuring to extract current state and setter function.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useState.md#2025-04-22_snippet_3
+
+LANGUAGE: javascript
+CODE:
+```
+import { useState } from 'react';
+
+function MyComponent() {
+  const [age, setAge] = useState(42);
+  const [name, setName] = useState('Taylor');
+  // ...
+```
+
+----------------------------------------
+
+TITLE: Declaring a Basic useEffect Hook in React
+DESCRIPTION: Shows the basic syntax for calling the `useEffect` Hook at the top level of a functional component. The callback function passed to `useEffect` contains the code that will run after every render of the component by default.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/synchronizing-with-effects.md#2025-04-22_snippet_1
+
+LANGUAGE: javascript
+CODE:
+```
+function MyComponent() {
+  useEffect(() => {
+    // Code here will run after *every* render
+  });
+  return <div />;
+}
+```
+
+----------------------------------------
+
+TITLE: Embedding JavaScript Variables in JSX Content
+DESCRIPTION: Demonstrates using JavaScript variables within JSX content by embedding them with curly braces inside an h1 element.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/javascript-in-jsx-with-curly-braces.md#2025-04-22_snippet_2
+
+LANGUAGE: jsx
+CODE:
+```
+export default function TodoList() {
+  const name = 'Gregorio Y. Zara';
+  return (
+    <h1>{name}'s To Do List</h1>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Applying CSS Class Names in React Components
+DESCRIPTION: Example showing how to apply a CSS class to a React component using the className attribute, similar to HTML's class attribute.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react-dom/components/common.md#2025-04-22_snippet_69
+
+LANGUAGE: javascript
+CODE:
+```
+<img className="avatar" />
+```
+
+----------------------------------------
+
+TITLE: Fetching and Displaying Albums in React with Suspense
+DESCRIPTION: This snippet shows the Albums component that fetches and displays a list of albums for an artist. It uses the use hook for data fetching, which is compatible with Suspense.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/Suspense.md#2025-04-22_snippet_40
+
+LANGUAGE: javascript
+CODE:
+```
+import {use} from 'react';
+import { fetchData } from './data.js';
+
+export default function Albums({ artistId }) {
+  const albums = use(fetchData(`/${artistId}/albums`));
+  return (
+    <ul>
+      {albums.map(album => (
+        <li key={album.id}>
+          {album.title} ({album.year})
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Creating a React Root in JavaScript
+DESCRIPTION: This code snippet demonstrates the process of creating a new React root using the createRoot function. The root is created for a given DOM node, allowing React to manage the DOM within it. After creation, the root can be used to render React components.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react-dom/client/createRoot.md#2025-04-22_snippet_0
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { createRoot } from 'react-dom/client';
+
+const domNode = document.getElementById('root');
+const root = createRoot(domNode);
+```
+
+----------------------------------------
+
+TITLE: Declaring Multiple State Variables in a Component
+DESCRIPTION: Example of declaring multiple state variables in a component by calling useState multiple times. Shows state initialization with primitive values and via a function call.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useState.md#2025-04-22_snippet_1
+
+LANGUAGE: javascript
+CODE:
+```
+import { useState } from 'react';
+
+function MyComponent() {
+  const [age, setAge] = useState(28);
+  const [name, setName] = useState('Taylor');
+  const [todos, setTodos] = useState(() => createTodos());
+  // ...
+```
+
+----------------------------------------
+
+TITLE: Fixed Pure Profile Component with Proper Props
+DESCRIPTION: A corrected version of the Profile component that follows React's principles by passing data through props instead of shared variables. This ensures each component instance renders with its own data.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/keeping-components-pure.md#2025-04-22_snippet_8
+
+LANGUAGE: jsx
+CODE:
+```
+import Panel from './Panel.js';
+import { getImageUrl } from './utils.js';
+
+export default function Profile({ person }) {
+  return (
+    <Panel>
+      <Header person={person} />
+      <Avatar person={person} />
+    </Panel>
+  )
+}
+
+function Header({ person }) {
+  return <h1>{person.name}</h1>;
+}
+
+function Avatar({ person }) {
+  return (
+    <img
+      className="avatar"
+      src={getImageUrl(person)}
+      alt={person.name}
+      width={50}
+      height={50}
+    />
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Properly Specifying Reactive Dependencies in useEffect
+DESCRIPTION: This example demonstrates how to correctly declare dependencies in a useEffect hook. When using reactive values like props or state in the effect body, they must be included in the dependency array.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useEffect.md#2025-04-22_snippet_20
+
+LANGUAGE: JavaScript
+CODE:
+```
+function ChatRoom({ roomId }) { // This is a reactive value
+  const [serverUrl, setServerUrl] = useState('https://localhost:1234'); // This is a reactive value too
+
+  useEffect(() => {
+    const connection = createConnection(serverUrl, roomId); // This Effect reads these reactive values
+    connection.connect();
+    return () => connection.disconnect();
+  }, [serverUrl, roomId]); // ✅ So you must specify them as dependencies of your Effect
+  // ...
+}
+```
+
+----------------------------------------
+
+TITLE: Positioning a React Tooltip using useLayoutEffect
+DESCRIPTION: This React component (`Tooltip`) displays tooltip content near a target element defined by `targetRect`. It uses `useRef` to get a reference to the tooltip's DOM node and `useState` to store its measured height. Crucially, it employs `useLayoutEffect` to measure the tooltip's height (`ref.current.getBoundingClientRect().height`) synchronously after rendering but before the browser paints. This allows it to accurately calculate the `tooltipY` position, trying to place it above the target (`targetRect.top - tooltipHeight`). If there isn't enough space above (`tooltipY < 0`), it positions the tooltip below the target (`targetRect.bottom`). `createPortal` is used to render the tooltip directly into the `document.body`, ensuring it isn't constrained by parent element styling or overflow.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useLayoutEffect.md#2025-04-22_snippet_10
+
+LANGUAGE: javascript
+CODE:
+```
+import { useRef, useLayoutEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import TooltipContainer from './TooltipContainer.js';
+
+export default function Tooltip({ children, targetRect }) {
+  const ref = useRef(null);
+  const [tooltipHeight, setTooltipHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const { height } = ref.current.getBoundingClientRect();
+    setTooltipHeight(height);
+  }, []);
+
+  let tooltipX = 0;
+  let tooltipY = 0;
+  if (targetRect !== null) {
+    tooltipX = targetRect.left;
+    tooltipY = targetRect.top - tooltipHeight;
+    if (tooltipY < 0) {
+      // It doesn't fit above, so place below.
+      tooltipY = targetRect.bottom;
+    }
+  }
+
+  return createPortal(
+    <TooltipContainer x={tooltipX} y={tooltipY} contentRef={ref}>
+      {children}
+    </TooltipContainer>,
+    document.body
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Optimizing Re-renders with useCallback and useMemo in React Context
+DESCRIPTION: This snippet shows how to optimize re-renders when passing objects and functions via context. It uses useCallback to memoize the login function and useMemo to memoize the context value object.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useContext.md#2025-04-22_snippet_22
+
+LANGUAGE: javascript
+CODE:
+```
+import { useCallback, useMemo } from 'react';
+
+function MyApp() {
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const login = useCallback((response) => {
+    storeCredentials(response.credentials);
+    setCurrentUser(response.user);
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    currentUser,
+    login
+  }), [currentUser, login]);
+
+  return (
+    <AuthContext.Provider value={contextValue}>
+      <Page />
+    </AuthContext.Provider>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Fixing State Mutations in React Component
+DESCRIPTION: An example of a form component with incorrect state update implementations. The code demonstrates three common bugs: directly mutating state without using setState, not properly spreading object properties when updating state, and how these issues affect component rendering.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/updating-objects-in-state.md#2025-04-22_snippet_17
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { useState } from 'react';
+
+export default function Scoreboard() {
+  const [player, setPlayer] = useState({
+    firstName: 'Ranjani',
+    lastName: 'Shettar',
+    score: 10,
+  });
+
+  function handlePlusClick() {
+    player.score++;
+  }
+
+  function handleFirstNameChange(e) {
+    setPlayer({
+      ...player,
+      firstName: e.target.value,
+    });
+  }
+
+  function handleLastNameChange(e) {
+    setPlayer({
+      lastName: e.target.value
+    });
+  }
+
+  return (
+    <>
+      <label>
+        Score: <b>{player.score}</b>
+        {' '}
+        <button onClick={handlePlusClick}>
+          +1
+        </button>
+      </label>
+      <label>
+        First name:
+        <input
+          value={player.firstName}
+          onChange={handleFirstNameChange}
+        />
+      </label>
+      <label>
+        Last name:
+        <input
+          value={player.lastName}
+          onChange={handleLastNameChange}
+        />
+      </label>
+    </>
+  );
+}
+```
+
+LANGUAGE: CSS
+CODE:
+```
+label { display: block; margin-bottom: 10px; }
+input { margin-left: 5px; margin-bottom: 5px; }
+```
+
+----------------------------------------
+
+TITLE: Mapping Array Items to JSX Elements
+DESCRIPTION: Using JavaScript's map() method to transform an array of strings into an array of JSX list item elements.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/rendering-lists.md#2025-04-22_snippet_2
+
+LANGUAGE: javascript
+CODE:
+```
+const listItems = people.map(person => <li>{person}</li>);
+```
+
+----------------------------------------
+
+TITLE: Avoiding Chains of Computations in React Effect Hooks
+DESCRIPTION: This snippet illustrates the problem with chaining Effects for state updates and provides a more efficient solution using event handlers and rendering calculations.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/you-might-not-need-an-effect.md#2025-04-23_snippet_7
+
+LANGUAGE: javascript
+CODE:
+```
+function Game() {
+  const [card, setCard] = useState(null);
+  const [goldCardCount, setGoldCardCount] = useState(0);
+  const [round, setRound] = useState(1);
+  const [isGameOver, setIsGameOver] = useState(false);
+
+  // 🔴 Avoid: Chains of Effects that adjust the state solely to trigger each other
+  useEffect(() => {
+    if (card !== null && card.gold) {
+      setGoldCardCount(c => c + 1);
+    }
+  }, [card]);
+
+  useEffect(() => {
+    if (goldCardCount > 3) {
+      setRound(r => r + 1)
+      setGoldCardCount(0);
+    }
+  }, [goldCardCount]);
+
+  useEffect(() => {
+    if (round > 5) {
+      setIsGameOver(true);
+    }
+  }, [round]);
+
+  useEffect(() => {
+    alert('Good game!');
+  }, [isGameOver]);
+
+  function handlePlaceCard(nextCard) {
+    if (isGameOver) {
+      throw Error('Game already ended.');
+    } else {
+      setCard(nextCard);
+    }
+  }
+
+  // ...
+```
+
+LANGUAGE: javascript
+CODE:
+```
+function Game() {
+  const [card, setCard] = useState(null);
+  const [goldCardCount, setGoldCardCount] = useState(0);
+  const [round, setRound] = useState(1);
+
+  // ✅ Calculate what you can during rendering
+  const isGameOver = round > 5;
+
+  function handlePlaceCard(nextCard) {
+    if (isGameOver) {
+      throw Error('Game already ended.');
+    }
+
+    // ✅ Calculate all the next state in the event handler
+    setCard(nextCard);
+    if (nextCard.gold) {
+      if (goldCardCount <= 3) {
+        setGoldCardCount(goldCardCount + 1);
+      } else {
+        setGoldCardCount(0);
+        setRound(round + 1);
+        if (round === 5) {
+          alert('Good game!');
+        }
+      }
+    }
+  }
+
+  // ...
+```
+
+----------------------------------------
+
+TITLE: Updating Context with State in React
+DESCRIPTION: Example showing how to update context values by combining context with state, allowing dynamic changes to the provided context value.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useContext.md#2025-04-22_snippet_5
+
+LANGUAGE: javascript
+CODE:
+```
+function MyPage() {
+  const [theme, setTheme] = useState('dark');
+  return (
+    <ThemeContext.Provider value={theme}>
+      <Form />
+      <Button onClick={() => {
+        setTheme('light');
+      }}>
+        Switch to light theme
+      </Button>
+    </ThemeContext.Provider>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Exporting React Component Example
+DESCRIPTION: Demonstrates how to properly export a React component using export default. Shows a Profile component that renders an image.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/your-first-component.md#2025-04-22_snippet_4
+
+LANGUAGE: javascript
+CODE:
+```
+export default function Profile() {
+  return (
+    <img
+      src="https://i.imgur.com/lICfvbD.jpg"
+      alt="Aklilu Lemma"
+    />
+  );
+}
+```
+
+LANGUAGE: css
+CODE:
+```
+img { height: 181px; }
+```
+
+----------------------------------------
+
+TITLE: Shared State Between Components
+DESCRIPTION: Implementation showing how to lift state up and share it between multiple button components using props.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/index.md#2025-04-22_snippet_20
+
+LANGUAGE: javascript
+CODE:
+```
+import { useState } from 'react';
+
+export default function MyApp() {
+  const [count, setCount] = useState(0);
+
+  function handleClick() {
+    setCount(count + 1);
+  }
+
+  return (
+    <div>
+      <h1>Counters that update together</h1>
+      <MyButton count={count} onClick={handleClick} />
+      <MyButton count={count} onClick={handleClick} />
+    </div>
+  );
+}
+
+function MyButton({ count, onClick }) {
+  return (
+    <button onClick={onClick}>
+      Clicked {count} times
+    </button>
+  );
+}
+```
+
+LANGUAGE: css
+CODE:
+```
+button {
+  display: block;
+  margin-bottom: 5px;
+}
+```
+
+----------------------------------------
+
+TITLE: Gallery Component with State Management - JavaScript
+DESCRIPTION: A complete React component demonstrating the initialization and update of a state variable using the useState Hook. If sculptureList is provided, it manages dynamic display logic for a gallery of sculptures, updating the view on each button click.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/state-a-components-memory.md#2025-04-22_snippet_5
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { useState } from 'react';
+import { sculptureList } from './data.js';
+
+export default function Gallery() {
+  const [index, setIndex] = useState(0);
+
+  function handleClick() {
+    setIndex(index + 1);
+  }
+
+  let sculpture = sculptureList[index];
+  return (
+    <>
+      <button onClick={handleClick}>
+        Next
+      </button>
+      <h2>
+        <i>{sculpture.name} </i> 
+        by {sculpture.artist}
+      </h2>
+      <h3>  
+        ({index + 1} of {sculptureList.length})
+      </h3>
+      <img 
+        src={sculpture.url} 
+        alt={sculpture.alt}
+      />
+      <p>
+        {sculpture.description}
+      </p>
+    </>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Correctly Updating Object State in React
+DESCRIPTION: The fixed version of the Scoreboard component showing proper immutable state updates. It demonstrates proper usage of the spread operator to create new state objects, ensuring that React detects state changes and triggers re-renders appropriately.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/updating-objects-in-state.md#2025-04-22_snippet_18
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { useState } from 'react';
+
+export default function Scoreboard() {
+  const [player, setPlayer] = useState({
+    firstName: 'Ranjani',
+    lastName: 'Shettar',
+    score: 10,
+  });
+
+  function handlePlusClick() {
+    setPlayer({
+      ...player,
+      score: player.score + 1,
+    });
+  }
+
+  function handleFirstNameChange(e) {
+    setPlayer({
+      ...player,
+      firstName: e.target.value,
+    });
+  }
+
+  function handleLastNameChange(e) {
+    setPlayer({
+      ...player,
+      lastName: e.target.value
+    });
+  }
+
+  return (
+    <>
+      <label>
+        Score: <b>{player.score}</b>
+        {' '}
+        <button onClick={handlePlusClick}>
+          +1
+        </button>
+      </label>
+      <label>
+        First name:
+        <input
+          value={player.firstName}
+          onChange={handleFirstNameChange}
+        />
+      </label>
+      <label>
+        Last name:
+        <input
+          value={player.lastName}
+          onChange={handleLastNameChange}
+        />
+      </label>
+    </>
+  );
+}
+```
+
+LANGUAGE: CSS
+CODE:
+```
+label { display: block; }
+input { margin-left: 5px; margin-bottom: 5px; }
+```
+
+----------------------------------------
+
+TITLE: Creating a Custom useData Hook for Fetching Data
+DESCRIPTION: A custom React Hook that encapsulates data fetching logic. This Hook accepts a URL, fetches data from that URL, and returns the retrieved data while handling cleanup to prevent state updates after unmounting.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/reusing-logic-with-custom-hooks.md#2025-04-22_snippet_23
+
+LANGUAGE: javascript
+CODE:
+```
+function useData(url) {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    if (url) {
+      let ignore = false;
+      fetch(url)
+        .then(response => response.json())
+        .then(json => {
+          if (!ignore) {
+            setData(json);
+          }
+        });
+      return () => {
+        ignore = true;
+      };
+    }
+  }, [url]);
+  return data;
+}
+```
+
+----------------------------------------
+
+TITLE: Custom Hook for Chat Room Connections
+DESCRIPTION: This snippet defines the custom hook `useChatRoom` which uses `useEffect` to handle reactivity and connection management for chat rooms. It requires server URL and room ID as parameters and abstracts the underlying useEffect logic used in `ChatRoom`.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/reusing-logic-with-custom-hooks.md#2025-04-22_snippet_17
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { useEffect } from 'react';
+import { createConnection } from './chat.js';
+import { showNotification } from './notifications.js';
+
+export function useChatRoom({ serverUrl, roomId }) {
+  useEffect(() => {
+    const options = {
+      serverUrl: serverUrl,
+      roomId: roomId
+    };
+    const connection = createConnection(options);
+    connection.connect();
+    connection.on('message', (msg) => {
+      showNotification('New message: ' + msg);
+    });
+    return () => connection.disconnect();
+  }, [roomId, serverUrl]);
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Suspense for Data Fetching Loading State
+DESCRIPTION: This JSX snippet shows how to wrap a component that fetches data (like the `Talks` component) with React's `Suspense` boundary. This allows you to define a fallback UI (like a loading indicator or skeleton) that is displayed while the data for the wrapped component is being fetched.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/creating-a-react-app.md#_snippet_4
+
+LANGUAGE: jsx
+CODE:
+```
+<Suspense fallback={<TalksLoading />}>
+  <Talks confId={conf.id} />
+</Suspense>
+```
+
+----------------------------------------
+
+TITLE: Complete Example of Context with State for Theme Switching
+DESCRIPTION: A complete example demonstrating how to create a theme switcher using context and state, with a checkbox to toggle between light and dark themes.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useContext.md#2025-04-22_snippet_6
+
+LANGUAGE: javascript
+CODE:
+```
+import { createContext, useContext, useState } from 'react';
+
+const ThemeContext = createContext(null);
+
+export default function MyApp() {
+  const [theme, setTheme] = useState('light');
+  return (
+    <ThemeContext.Provider value={theme}>
+      <Form />
+      <label>
+        <input
+          type="checkbox"
+          checked={theme === 'dark'}
+          onChange={(e) => {
+            setTheme(e.target.checked ? 'dark' : 'light')
+          }}
+        />
+        Use dark mode
+      </label>
+    </ThemeContext.Provider>
+  )
+}
+
+function Form({ children }) {
+  return (
+    <Panel title="Welcome">
+      <Button>Sign up</Button>
+      <Button>Log in</Button>
+    </Panel>
+  );
+}
+
+function Panel({ title, children }) {
+  const theme = useContext(ThemeContext);
+  const className = 'panel-' + theme;
+  return (
+    <section className={className}>
+      <h1>{title}</h1>
+      {children}
+    </section>
+  )
+}
+
+function Button({ children }) {
+  const theme = useContext(ThemeContext);
+  const className = 'button-' + theme;
+  return (
+    <button className={className}>
+      {children}
+    </button>
+  );
+}
+```
+
+LANGUAGE: css
+CODE:
+```
+.panel-light,
+.panel-dark {
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 10px;
+}
+.panel-light {
+  color: #222;
+  background: #fff;
+}
+
+.panel-dark {
+  color: #fff;
+  background: rgb(23, 32, 42);
+}
+
+.button-light,
+.button-dark {
+  border: 1px solid #777;
+  padding: 5px;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.button-dark {
+  background: #222;
+  color: #fff;
+}
+
+.button-light {
+  background: #fff;
+  color: #222;
+}
+```
+
+----------------------------------------
+
+TITLE: Using JavaScript Expressions in JSX
+DESCRIPTION: Demonstrates how to embed JavaScript expressions within JSX using curly braces, allowing dynamic content and styling in React components.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/describing-the-ui.md#2025-04-22_snippet_3
+
+LANGUAGE: jsx
+CODE:
+```
+const person = {
+  name: 'Gregorio Y. Zara',
+  theme: {
+    backgroundColor: 'black',
+    color: 'pink'
+  }
+};
+
+export default function TodoList() {
+  return (
+    <div style={person.theme}>
+      <h1>{person.name}'s Todos</h1>
+      <img
+        className="avatar"
+        src="https://i.imgur.com/7vQD0fPs.jpg"
+        alt="Gregorio Y. Zara"
+      />
+      <ul>
+        <li>Improve the videophone</li>
+        <li>Prepare aeronautics lectures</li>
+        <li>Work on the alcohol-fuelled engine</li>
+      </ul>
+    </div>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Updating Nested Object State in React Form
+DESCRIPTION: A React component that demonstrates how to update nested state objects immutably in a form. It maintains a person object with nested artwork data and shows proper state update patterns using the spread operator.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useState.md#2025-04-22_snippet_19
+
+LANGUAGE: javascript
+CODE:
+```
+import { useState } from 'react';
+
+export default function Form() {
+  const [person, setPerson] = useState({
+    name: 'Niki de Saint Phalle',
+    artwork: {
+      title: 'Blue Nana',
+      city: 'Hamburg',
+      image: 'https://i.imgur.com/Sd1AgUOm.jpg',
+    }
+  });
+
+  function handleNameChange(e) {
+    setPerson({
+      ...person,
+      name: e.target.value
+    });
+  }
+
+  function handleTitleChange(e) {
+    setPerson({
+      ...person,
+      artwork: {
+        ...person.artwork,
+        title: e.target.value
+      }
+    });
+  }
+
+  function handleCityChange(e) {
+    setPerson({
+      ...person,
+      artwork: {
+        ...person.artwork,
+        city: e.target.value
+      }
+    });
+  }
+
+  function handleImageChange(e) {
+    setPerson({
+      ...person,
+      artwork: {
+        ...person.artwork,
+        image: e.target.value
+      }
+    });
+  }
+
+  return (
+    <>
+      <label>
+        Name:
+        <input
+          value={person.name}
+          onChange={handleNameChange}
+        />
+      </label>
+      <label>
+        Title:
+        <input
+          value={person.artwork.title}
+          onChange={handleTitleChange}
+        />
+      </label>
+      <label>
+        City:
+        <input
+          value={person.artwork.city}
+          onChange={handleCityChange}
+        />
+      </label>
+      <label>
+        Image:
+        <input
+          value={person.artwork.image}
+          onChange={handleImageChange}
+        />
+      </label>
+      <p>
+        <i>{person.artwork.title}</i>
+        {' by '}
+        {person.name}
+        <br />
+        (located in {person.artwork.city})
+      </p>
+      <img 
+        src={person.artwork.image} 
+        alt={person.artwork.title}
+      />
+    </>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Event Handlers and Custom Components in React
+DESCRIPTION: This snippet demonstrates how to create custom components with event handlers in React. It shows the implementation of a Toolbar component with custom event props, and a reusable Button component that accepts an onClick prop.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/adding-interactivity.md#2025-04-22_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+export default function App() {
+  return (
+    <Toolbar
+      onPlayMovie={() => alert('Playing!')}
+      onUploadImage={() => alert('Uploading!')}
+    />
+  );
+}
+
+function Toolbar({ onPlayMovie, onUploadImage }) {
+  return (
+    <div>
+      <Button onClick={onPlayMovie}>
+        Play Movie
+      </Button>
+      <Button onClick={onUploadImage}>
+        Upload Image
+      </Button>
+    </div>
+  );
+}
+
+function Button({ onClick, children }) {
+  return (
+    <button onClick={onClick}>
+      {children}
+    </button>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Combining React useDeferredValue and Visual Cues for Stale Data (App.js)
+DESCRIPTION: The complete `App` component implementing the deferred value pattern. It uses `useState` for the immediate query, `useDeferredValue` to get the deferred query, and computes an `isStale` boolean. The `SearchResults` component receives the `deferredQuery` and is wrapped in a `div` whose opacity is controlled by `isStale`, providing feedback while avoiding the main Suspense fallback.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/Suspense.md#2025-04-22_snippet_24
+
+LANGUAGE: javascript
+CODE:
+```
+import { Suspense, useState, useDeferredValue } from 'react';
+import SearchResults from './SearchResults.js';
+
+export default function App() {
+  const [query, setQuery] = useState('');
+  const deferredQuery = useDeferredValue(query);
+  const isStale = query !== deferredQuery;
+  return (
+    <>
+      <label>
+        Search albums:
+        <input value={query} onChange={e => setQuery(e.target.value)} />
+      </label>
+      <Suspense fallback={<h2>Loading...</h2>}>
+        <div style={{ opacity: isStale ? 0.5 : 1 }}>
+          <SearchResults query={deferredQuery} />
+        </div>
+      </Suspense>
+    </>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Fixing Double Interval in React Effect
+DESCRIPTION: Demonstrates how to properly handle interval cleanup in a React useEffect hook to prevent memory leaks and double execution. Uses clearInterval in the cleanup function to properly manage intervals.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/synchronizing-with-effects.md#2025-04-22_snippet_33
+
+LANGUAGE: javascript
+CODE:
+```
+import { useState, useEffect } from 'react';
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    function onTick() {
+      setCount(c => c + 1);
+    }
+
+    const intervalId = setInterval(onTick, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  return <h1>{count}</h1>;
+}
+```
+
+----------------------------------------
+
+TITLE: Conditional Rendering with Ternary Operator
+DESCRIPTION: Demonstrates inline conditional rendering using the JavaScript ternary operator (condition ? true : false) within JSX.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/index.md#2025-04-22_snippet_10
+
+LANGUAGE: javascript
+CODE:
+```
+<div>
+  {isLoggedIn ? (
+    <AdminPanel />
+  ) : (
+    <LoginForm />
+  )}
+</div>
+```
+
+----------------------------------------
+
+TITLE: Creating a Text Input with useState
+DESCRIPTION: Example of a text input component that uses useState to store and update the input value. Demonstrates the controlled component pattern with onChange handler.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useState.md#2025-04-22_snippet_6
+
+LANGUAGE: javascript
+CODE:
+```
+import { useState } from 'react';
+
+export default function MyInput() {
+  const [text, setText] = useState('hello');
+
+  function handleChange(e) {
+    setText(e.target.value);
+  }
+
+  return (
+    <>
+      <input value={text} onChange={handleChange} />
+      <p>You typed: {text}</p>
+      <button onClick={() => setText('hello')}>
+        Reset
+      </button>
+    </>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Server and Client Component Composition
+DESCRIPTION: Example showing how to compose Server Components with interactive Client Components using the use client directive.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/rsc/server-components.md#2025-04-22_snippet_4
+
+LANGUAGE: javascript
+CODE:
+```
+// Server Component
+import Expandable from './Expandable';
+
+async function Notes() {
+  const notes = await db.notes.getAll();
+  return (
+    <div>
+      {notes.map(note => (
+        <Expandable key={note.id}>
+          <p note={note} />
+        </Expandable>
+      ))}
+    </div>
+  )
+}
+
+// Client Component
+"use client"
+
+export default function Expandable({children}) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div>
+      <button
+        onClick={() => setExpanded(!expanded)}
+      >
+        Toggle
+      </button>
+      {expanded && children}
+    </div>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Creating a Basic React Component with Props
+DESCRIPTION: Example of a simple React component structure with props. The code shows a Greeting component that accepts a name prop and renders it inside an h1 element, and an App component that renders the Greeting with 'world' as the name.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/installation.md#2025-04-22_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+function Greeting({ name }) {
+  return <h1>Hello, {name}</h1>;
+}
+
+export default function App() {
+  return <Greeting name="world" />
+}
+```
+
+----------------------------------------
+
+TITLE: Albums Component Fetching Data with use Hook in JavaScript
+DESCRIPTION: This component fetches album data for a given artist ID using the `use` hook and the provided `fetchData` utility. The `use` hook allows reading the result of a promise synchronously, enabling Suspense integration. It then renders the list of albums.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/reference/react/useTransition.md#_snippet_32
+
+LANGUAGE: js
+CODE:
+```
+import {use} from 'react';
+import { fetchData } from './data.js';
+
+export default function Albums({ artistId }) {
+  const albums = use(fetchData(`/${artistId}/albums`));
+  return (
+    <ul>
+      {albums.map(album => (
+        <li key={album.id}>
+          {album.title} ({album.year})
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Defining Component Props with TypeScript in React
+DESCRIPTION: This snippet demonstrates how to define types for React component props using TypeScript, showing both inline types for components and using interfaces for cleaner definitions. It requires a TypeScript environment and React setup.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/typescript.md#2025-04-22_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+function MyButton({ title }: { title: string }) {
+  return (
+    <button>{title}</button>
+  );
+}
+
+export default function MyApp() {
+  return (
+    <div>
+      <h1>Welcome to my app</h1>
+      <MyButton title="I'm a button" />
+    </div>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Controlling Non-React Widgets with useEffect
+DESCRIPTION: Using useEffect to interact with external UI widgets that aren't written in React, such as setting the zoom level on a map component.
+SOURCE: https://github.com/reactjs/react.dev/blob/main/src/content/learn/synchronizing-with-effects.md#2025-04-22_snippet_17
+
+LANGUAGE: javascript
+CODE:
+```
+useEffect(() => {
+  const map = mapRef.current;
+  map.setZoomLevel(zoomLevel);
+}, [zoomLevel]);
+```
