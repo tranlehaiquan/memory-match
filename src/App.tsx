@@ -3,7 +3,7 @@ import { useAuthStore } from './store/authStore';
 import { useEffect } from 'react';
 
 function App() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ function App() {
           Memory Match Game
         </h1>
       </header>
-      
+
       <main className="w-full flex-1 overflow-hidden px-4 pb-4">
         <div className="w-full h-full max-w-5xl mx-auto">
           <Outlet />
@@ -29,4 +29,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;

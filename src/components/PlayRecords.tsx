@@ -3,7 +3,7 @@ import { useRecordsStore } from '../store/recordsStore';
 import { formatTime } from '../utils/formatTime';
 
 export const PlayRecords = () => {
-  const records = useRecordsStore((state) => state.records);
+  const records = useRecordsStore(state => state.records);
 
   if (records.length === 0) {
     return (
@@ -20,15 +20,13 @@ export const PlayRecords = () => {
     <div className="w-full h-full bg-white rounded-xl shadow-md p-4 overflow-auto">
       <h2 className="text-xl font-bold text-blue-700 mb-3">Recent Games</h2>
       <ul className="space-y-2 overflow-y-auto custom-scrollbar">
-        {records.map((record) => (
+        {records.map(record => (
           <motion.li
             key={record.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className={`p-3 rounded-lg border ${
-              record.won
-                ? 'border-green-200 bg-green-50'
-                : 'border-red-200 bg-red-50'
+              record.won ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
             }`}
           >
             <div className="flex justify-between items-center mb-1">
@@ -62,4 +60,4 @@ export const PlayRecords = () => {
       </ul>
     </div>
   );
-}; 
+};

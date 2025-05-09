@@ -9,16 +9,16 @@ interface TimerState {
   reset: () => void;
 }
 
-export const useTimerStore = create<TimerState>((set) => ({
+export const useTimerStore = create<TimerState>(set => ({
   isRunning: false,
   elapsedTime: 0,
   intervalId: null,
   start: () => {
-    set((state) => {
+    set(state => {
       if (state.isRunning) return state;
-      
+
       const intervalId = window.setInterval(() => {
-        set((state) => ({
+        set(state => ({
           elapsedTime: state.elapsedTime + 1,
         }));
       }, 1000);
@@ -30,7 +30,7 @@ export const useTimerStore = create<TimerState>((set) => ({
     });
   },
   stop: () => {
-    set((state) => {
+    set(state => {
       if (state.intervalId) {
         clearInterval(state.intervalId);
       }
@@ -41,7 +41,7 @@ export const useTimerStore = create<TimerState>((set) => ({
     });
   },
   reset: () => {
-    set((state) => {
+    set(state => {
       if (state.intervalId) {
         clearInterval(state.intervalId);
       }
@@ -52,4 +52,4 @@ export const useTimerStore = create<TimerState>((set) => ({
       };
     });
   },
-})); 
+}));

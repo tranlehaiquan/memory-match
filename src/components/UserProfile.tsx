@@ -1,9 +1,9 @@
 import { useAuthStore } from '../store/authStore';
 
 export const UserProfile = () => {
-  const username = useAuthStore((state) => state.username);
-  const highScore = useAuthStore((state) => state.highScore);
-  const logout = useAuthStore((state) => state.logout);
+  const username = useAuthStore(state => state.username);
+  const highScore = useAuthStore(state => state.highScore);
+  const logout = useAuthStore(state => state.logout);
 
   return (
     <div className="flex justify-between items-center mb-3 px-1 text-sm">
@@ -18,7 +18,7 @@ export const UserProfile = () => {
           <span className="font-medium">High Score:</span>
           <span>{highScore}</span>
         </div>
-        <button 
+        <button
           onClick={logout}
           className="bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded text-xs font-medium transition-colors"
         >
@@ -27,4 +27,4 @@ export const UserProfile = () => {
       </div>
     </div>
   );
-}; 
+};

@@ -25,7 +25,7 @@ export const GameControls = ({ status, onPlay, onPause, onEnd, onReset }: GameCo
           </button>
         </>
       )}
-      
+
       {status === 'paused' && (
         <>
           <button
@@ -42,7 +42,7 @@ export const GameControls = ({ status, onPlay, onPause, onEnd, onReset }: GameCo
           </button>
         </>
       )}
-      
+
       {status === 'ended' && (
         <button
           onClick={onReset}
@@ -53,4 +53,4 @@ export const GameControls = ({ status, onPlay, onPause, onEnd, onReset }: GameCo
       )}
     </div>
   );
-}; 
+};

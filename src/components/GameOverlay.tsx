@@ -12,7 +12,7 @@ export const GameOverlay = ({ status, score, isWinner, onPlayAgain }: GameOverla
   return (
     <>
       <Confetti isActive={status === 'ended' && isWinner} />
-      
+
       <AnimatePresence mode="wait">
         {status === 'ended' && (
           <motion.div
@@ -26,7 +26,7 @@ export const GameOverlay = ({ status, score, isWinner, onPlayAgain }: GameOverla
               className="bg-white p-8 rounded-xl shadow-xl text-center"
               initial={{ y: 50, scale: 0.8 }}
               animate={{ y: 0, scale: 1 }}
-              transition={{ type: "spring", duration: 0.5 }}
+              transition={{ type: 'spring', duration: 0.5 }}
             >
               <motion.h2
                 initial={{ y: 20, opacity: 0 }}
@@ -58,4 +58,4 @@ export const GameOverlay = ({ status, score, isWinner, onPlayAgain }: GameOverla
       </AnimatePresence>
     </>
   );
-}; 
+};

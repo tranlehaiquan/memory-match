@@ -1,19 +1,19 @@
-import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { useAuthStore } from '../store/authStore'
+import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { useAuthStore } from '../store/authStore';
 
 export const Login = () => {
-  const [username, setUsername] = useState('')
-  const login = useAuthStore((state) => state.login)
-  const navigate = useNavigate()
+  const [username, setUsername] = useState('');
+  const login = useAuthStore(state => state.login);
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (username.trim()) {
-      login(username.trim())
-      navigate({ to: '/' })
+      login(username.trim());
+      navigate({ to: '/' });
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50">
@@ -28,7 +28,7 @@ export const Login = () => {
               type="text"
               id="username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={e => setUsername(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Username"
               required
@@ -43,5 +43,5 @@ export const Login = () => {
         </form>
       </div>
     </div>
-  )
-} 
+  );
+};

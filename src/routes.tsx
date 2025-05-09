@@ -28,4 +28,4 @@ const routeTree = rootRoute.addChildren([indexRoute, loginRoute]);
 export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
-}); 
+});

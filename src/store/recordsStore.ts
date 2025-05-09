@@ -13,27 +13,27 @@ export const useRecordsStore = create<RecordsState>()(
   persist(
     (set, get) => ({
       records: [],
-      addRecord: (record) => {
+      addRecord: record => {
         const newRecord: PlayRecord = {
           ...record,
           id: crypto.randomUUID(),
           completedAt: new Date().toISOString(),
         };
-        set((state) => ({
+        set(state => ({
           records: [newRecord, ...state.records].slice(0, 10), // Keep only top 10 records
         }));
       },
       clearRecords: () => set({ records: [] }),
-      getPlayerBestScore: (playerName) => {
+      getPlayerBestScore: playerName => {
         const playerRecords = get().records.filter(
-          (record) => record.playerName === playerName && record.won
+          record => record.playerName === playerName && record.won
         );
         if (playerRecords.length === 0) return 0;
-        return Math.max(...playerRecords.map((record) => record.score));
+        return Math.max(...playerRecords.map(record => record.score));
       },
     }),
     {
       name: 'memory-match-records',
     }
   )
-); 
+);

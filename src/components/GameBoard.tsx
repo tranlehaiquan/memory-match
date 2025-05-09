@@ -1,40 +1,35 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card } from "./Card";
-import { Timer } from "./Timer";
-import { GameControls } from "./GameControls";
-import { GameOverlay } from "./GameOverlay";
-import { UserProfile } from "./UserProfile";
-import { PlayRecords } from "./PlayRecords";
-import { generateCards, checkMatch, isGameComplete } from "../utils/gameUtils";
-import { GameState, GameDifficulty } from "../types/game";
-import { useAuthStore } from "../store/authStore";
-import { useTimerStore } from "../store/timerStore";
-import { useRecordsStore } from "../store/recordsStore";
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card } from './Card';
+import { Timer } from './Timer';
+import { GameControls } from './GameControls';
+import { GameOverlay } from './GameOverlay';
+import { UserProfile } from './UserProfile';
+import { PlayRecords } from './PlayRecords';
+import { generateCards, checkMatch, isGameComplete } from '../utils/gameUtils';
+import { GameState, GameDifficulty } from '../types/game';
+import { useAuthStore } from '../store/authStore';
+import { useTimerStore } from '../store/timerStore';
+import { useRecordsStore } from '../store/recordsStore';
 
 export const GameBoard = () => {
   const { username } = useAuthStore();
-  const addRecord = useRecordsStore((state) => state.addRecord);
-  const {
-    start: startTimer,
-    stop: stopTimer,
-    reset: resetTimer,
-    elapsedTime,
-  } = useTimerStore();
+  const addRecord = useRecordsStore(state => state.addRecord);
+  const { start: startTimer, stop: stopTimer, reset: resetTimer, elapsedTime } = useTimerStore();
   const [gameState, setGameState] = useState<GameState>({
     cards: generateCards(),
     score: 0,
     moves: 0,
     isGameOver: false,
     flippedCards: [],
-    status: "idle",
-    difficulty: "easy",
+    status: 'idle',
+    difficulty: 'easy',
   });
 
-  const updateHighScore = useAuthStore((state) => state.updateHighScore);
+  const updateHighScore = useAuthStore(state => state.updateHighScore);
 
   const handleDifficultyChange = (difficulty: GameDifficulty) => {
-    setGameState((prev) => ({
+    setGameState(prev => ({
       ...prev,
       difficulty,
       cards: generateCards(difficulty),
@@ -42,10 +37,10 @@ export const GameBoard = () => {
   };
 
   const handleStartGame = () => {
-    setGameState((prev) => ({
+    setGameState(prev => ({
       ...prev,
       cards: generateCards(prev.difficulty),
-      status: "playing",
+      status: 'playing',
       score: 0,
       moves: 0,
       isGameOver: false,
@@ -55,17 +50,17 @@ export const GameBoard = () => {
   };
 
   const handlePlay = () => {
-    setGameState((prev) => ({ ...prev, status: "playing" }));
+    setGameState(prev => ({ ...prev, status: 'playing' }));
     startTimer();
   };
 
   const handlePause = () => {
-    setGameState((prev) => ({ ...prev, status: "paused" }));
+    setGameState(prev => ({ ...prev, status: 'paused' }));
     stopTimer();
   };
 
   const handleEnd = () => {
-    setGameState((prev) => ({ ...prev, status: "ended", isGameOver: true }));
+    setGameState(prev => ({ ...prev, status: 'ended', isGameOver: true }));
     stopTimer();
     addRecord({
       playerName: username,
@@ -85,22 +80,18 @@ export const GameBoard = () => {
       moves: 0,
       isGameOver: false,
       flippedCards: [],
-      status: "idle",
+      status: 'idle',
       difficulty: gameState.difficulty,
     });
     resetTimer();
   };
 
   const handleCardClick = (cardId: number) => {
-    if (gameState.status !== "playing") return;
+    if (gameState.status !== 'playing') return;
 
     const { cards, flippedCards, moves } = gameState;
 
-    if (
-      cards[cardId].isFlipped ||
-      cards[cardId].isMatched ||
-      flippedCards.length >= 2
-    ) {
+    if (cards[cardId].isFlipped || cards[cardId].isMatched || flippedCards.length >= 2) {
       return;
     }
 
@@ -109,7 +100,7 @@ export const GameBoard = () => {
     );
 
     const newFlippedCards = [...flippedCards, cardId];
-    setGameState((prev) => ({
+    setGameState(prev => ({
       ...prev,
       cards: newCards,
       flippedCards: newFlippedCards,
@@ -121,22 +112,20 @@ export const GameBoard = () => {
         const isMatch = checkMatch(newCards, newFlippedCards);
         const updatedCards = newCards.map((card, index) => ({
           ...card,
-          isMatched:
-            card.isMatched || (isMatch && newFlippedCards.includes(index)),
-          isFlipped:
-            card.isMatched || (isMatch && newFlippedCards.includes(index)),
+          isMatched: card.isMatched || (isMatch && newFlippedCards.includes(index)),
+          isFlipped: card.isMatched || (isMatch && newFlippedCards.includes(index)),
         }));
 
         const newScore = isMatch ? gameState.score + 10 : gameState.score - 1;
         const isGameOver = isGameComplete(updatedCards);
 
-        setGameState((prev) => ({
+        setGameState(prev => ({
           ...prev,
           cards: updatedCards,
           flippedCards: [],
           score: newScore,
           isGameOver,
-          status: isGameOver ? "ended" : "playing",
+          status: isGameOver ? 'ended' : 'playing',
         }));
 
         if (isGameOver) {
@@ -147,7 +136,7 @@ export const GameBoard = () => {
     }
   };
 
-  const isWinner = gameState.status === "ended" && gameState.score > 0;
+  const isWinner = gameState.status === 'ended' && gameState.score > 0;
 
   const getDifficultyGridCols = () => {
     switch (gameState.difficulty) {
@@ -168,10 +157,10 @@ export const GameBoard = () => {
         status={gameState.status}
         score={gameState.score}
         isWinner={isWinner}
-        onPlayAgain={gameState.status === "ended" ? resetGame : handleStartGame}
+        onPlayAgain={gameState.status === 'ended' ? resetGame : handleStartGame}
       />
 
-      {gameState.status === "idle" ? (
+      {gameState.status === 'idle' ? (
         <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden">
           <div className="w-full h-full min-h-0 overflow-hidden order-2 lg:order-1 lg:pr-2">
             <PlayRecords />
@@ -180,19 +169,19 @@ export const GameBoard = () => {
           <div className="w-full h-full min-h-0 order-1 lg:order-2 lg:pl-2">
             <div className="w-full h-full bg-white rounded-xl shadow-md p-4 overflow-auto">
               <UserProfile />
-              
+
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col items-center justify-center p-4 mt-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl shadow-inner"
               >
-                <h2 className="text-2xl font-bold mb-3 text-blue-700">
-                  Ready to Play?
-                </h2>
+                <h2 className="text-2xl font-bold mb-3 text-blue-700">Ready to Play?</h2>
                 <p className="text-gray-600 mb-4 text-md">Match all the cards to win!</p>
-                
+
                 <div className="mb-5 w-full max-w-xs">
-                  <h3 className="text-md font-semibold text-gray-700 mb-2 text-center">Select Difficulty</h3>
+                  <h3 className="text-md font-semibold text-gray-700 mb-2 text-center">
+                    Select Difficulty
+                  </h3>
                   <div className="flex justify-between gap-2">
                     <button
                       onClick={() => handleDifficultyChange('easy')}
@@ -226,14 +215,14 @@ export const GameBoard = () => {
                     </button>
                   </div>
                   <p className="text-xs text-gray-500 mt-1 text-center">
-                    {gameState.difficulty === 'easy' 
-                      ? '16 cards (8 pairs)' 
-                      : gameState.difficulty === 'medium' 
-                        ? '24 cards (12 pairs)' 
+                    {gameState.difficulty === 'easy'
+                      ? '16 cards (8 pairs)'
+                      : gameState.difficulty === 'medium'
+                        ? '24 cards (12 pairs)'
                         : '36 cards (18 pairs)'}
                   </p>
                 </div>
-                
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -249,7 +238,7 @@ export const GameBoard = () => {
       ) : (
         <div className="w-full h-full overflow-auto bg-white rounded-xl shadow-md p-4">
           <UserProfile />
-          
+
           <div className="flex flex-col items-center gap-4 mb-6">
             <AnimatePresence mode="wait">
               <motion.div
@@ -291,7 +280,7 @@ export const GameBoard = () => {
                 </div>
               </motion.div>
             </AnimatePresence>
-            
+
             <GameControls
               status={gameState.status}
               onPlay={handlePlay}
@@ -307,17 +296,17 @@ export const GameBoard = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               className={`grid ${getDifficultyGridCols()} gap-3 mx-auto`}
-              style={{ 
-                maxWidth: gameState.difficulty === 'easy' ? '450px' : 
-                          gameState.difficulty === 'medium' ? '650px' : '800px' 
+              style={{
+                maxWidth:
+                  gameState.difficulty === 'easy'
+                    ? '450px'
+                    : gameState.difficulty === 'medium'
+                      ? '650px'
+                      : '800px',
               }}
             >
-              {gameState.cards.map((card) => (
-                <Card
-                  key={card.id}
-                  card={card}
-                  onClick={() => handleCardClick(card.id)}
-                />
+              {gameState.cards.map(card => (
+                <Card key={card.id} card={card} onClick={() => handleCardClick(card.id)} />
               ))}
             </motion.div>
           </AnimatePresence>

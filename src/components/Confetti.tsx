@@ -15,7 +15,28 @@ interface ConfettiProps {
   isActive: boolean;
 }
 
-const ICONS = ['🎉', '🎊', '🏆', '⭐', '✨', '🌟', '💯', '🥇', '👑', '🎮', '🎯', '🎪', '🎨', '🎭', '🎪', '🎡', '🎠', '🧨', '🎇', '🎆'];
+const ICONS = [
+  '🎉',
+  '🎊',
+  '🏆',
+  '⭐',
+  '✨',
+  '🌟',
+  '💯',
+  '🥇',
+  '👑',
+  '🎮',
+  '🎯',
+  '🎪',
+  '🎨',
+  '🎭',
+  '🎪',
+  '🎡',
+  '🎠',
+  '🧨',
+  '🎇',
+  '🎆',
+];
 
 export const Confetti = ({ isActive }: ConfettiProps) => {
   const [pieces, setPieces] = useState<ConfettiPiece[]>([]);
@@ -41,26 +62,26 @@ export const Confetti = ({ isActive }: ConfettiProps) => {
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-30">
-      {pieces.map((piece) => (
+      {pieces.map(piece => (
         <motion.div
           key={piece.id}
-          initial={{ 
+          initial={{
             y: Math.random() * -100 - 50, // Varied starting positions
-            x: `${piece.x}vw`, 
+            x: `${piece.x}vw`,
             opacity: 1,
             rotate: piece.rotation,
-            scale: 0
+            scale: 0,
           }}
-          animate={{ 
-            y: '110vh', 
+          animate={{
+            y: '110vh',
             opacity: [1, 1, 0.9, 0.8, 0.7, 0],
             rotate: piece.rotation + (Math.random() > 0.5 ? 360 : -360),
-            scale: [0, 1, 1, 0.9, 0.8]
+            scale: [0, 1, 1, 0.9, 0.8],
           }}
           transition={{
             duration: piece.duration,
             delay: piece.delay,
-            ease: "easeOut" // Changed to easeOut for slower finish
+            ease: 'easeOut', // Changed to easeOut for slower finish
           }}
           className="absolute top-0 select-none"
           style={{ fontSize: piece.size }}
@@ -70,4 +91,4 @@ export const Confetti = ({ isActive }: ConfettiProps) => {
       ))}
     </div>
   );
-}; 
+};

@@ -19,7 +19,7 @@ export const Card = ({ card, onClick }: CardProps) => {
         className="w-full h-full relative transform-style-3d"
         initial={false}
         animate={{ rotateY: card.isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 300, damping: 30 }}
+        transition={{ duration: 0.5, type: 'spring', stiffness: 300, damping: 30 }}
       >
         {/* Front of card (question mark side) */}
         <motion.div
@@ -33,9 +33,10 @@ export const Card = ({ card, onClick }: CardProps) => {
         <motion.div
           className={`absolute w-full h-full backface-hidden flex items-center justify-center
             rounded-lg text-2xl font-bold text-white rotate-y-180 shadow-md
-            ${card.isMatched 
-              ? 'bg-gradient-to-br from-green-500 to-green-600' 
-              : 'bg-gradient-to-br from-purple-500 to-purple-600'
+            ${
+              card.isMatched
+                ? 'bg-gradient-to-br from-green-500 to-green-600'
+                : 'bg-gradient-to-br from-purple-500 to-purple-600'
             }`}
         >
           {card.value}
@@ -43,4 +44,4 @@ export const Card = ({ card, onClick }: CardProps) => {
       </motion.div>
     </motion.div>
   );
-}; 
+};

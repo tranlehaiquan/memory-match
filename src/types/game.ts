@@ -26,4 +26,4 @@ export interface PlayRecord {
   completedAt: string;
   won: boolean;
   difficulty?: GameDifficulty;
-} 
+}

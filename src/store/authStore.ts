@@ -12,14 +12,14 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    set => ({
       isAuthenticated: false,
       username: '',
       highScore: 0,
       login: (username: string) => set({ isAuthenticated: true, username }),
       logout: () => set({ isAuthenticated: false, username: '' }),
       updateHighScore: (score: number) =>
-        set((state) => ({
+        set(state => ({
           highScore: Math.max(state.highScore, score),
         })),
     }),
@@ -27,4 +27,4 @@ export const useAuthStore = create<AuthState>()(
       name: 'memory-match-auth',
     }
   )
-); 
+);
