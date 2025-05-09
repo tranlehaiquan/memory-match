@@ -9,15 +9,6 @@ interface GameControlsProps {
 export const GameControls = ({ status, onPlay, onPause, onEnd, onReset }: GameControlsProps) => {
   return (
     <div className="flex gap-3">
-      {status === 'idle' && (
-        <button
-          onClick={onPlay}
-          className="bg-green-500 text-white px-8 py-3 rounded-md hover:bg-green-600 transition-colors text-lg font-semibold"
-        >
-          Play Game
-        </button>
-      )}
-      
       {status === 'playing' && (
         <>
           <button

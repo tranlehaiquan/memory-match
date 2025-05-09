@@ -10,8 +10,11 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.2",
+    "@tanstack/react-router": "^1.120.3",
+    "@tanstack/router": "0.0.1-beta.53",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.10.5",
     "lucide-react": "^0.509.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

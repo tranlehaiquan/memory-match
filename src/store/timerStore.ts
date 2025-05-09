@@ -1,21 +1,55 @@
 import { create } from 'zustand';
 
 interface TimerState {
-  time: number;
   isRunning: boolean;
-  startTime: number | null;
+  elapsedTime: number;
+  intervalId: number | null;
   start: () => void;
   stop: () => void;
   reset: () => void;
-  tick: () => void;
 }
 
-export const useTimerStore = create<TimerState>()((set) => ({
-  time: 0,
+export const useTimerStore = create<TimerState>((set) => ({
   isRunning: false,
-  startTime: null,
-  start: () => set({ isRunning: true, startTime: Date.now() }),
-  stop: () => set({ isRunning: false }),
-  reset: () => set({ time: 0, isRunning: false, startTime: null }),
-  tick: () => set((state) => ({ time: state.time + 1 })),
+  elapsedTime: 0,
+  intervalId: null,
+  start: () => {
+    set((state) => {
+      if (state.isRunning) return state;
+      
+      const intervalId = window.setInterval(() => {
+        set((state) => ({
+          elapsedTime: state.elapsedTime + 1,
+        }));
+      }, 1000);
+
+      return {
+        isRunning: true,
+        intervalId,
+      };
+    });
+  },
+  stop: () => {
+    set((state) => {
+      if (state.intervalId) {
+        clearInterval(state.intervalId);
+      }
+      return {
+        isRunning: false,
+        intervalId: null,
+      };
+    });
+  },
+  reset: () => {
+    set((state) => {
+      if (state.intervalId) {
+        clearInterval(state.intervalId);
+      }
+      return {
+        isRunning: false,
+        elapsedTime: 0,
+        intervalId: null,
+      };
+    });
+  },
 })); 

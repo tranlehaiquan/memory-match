@@ -1,14 +1,17 @@
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useAuthStore } from '../store/authStore'
 
 export const Login = () => {
   const [username, setUsername] = useState('')
   const login = useAuthStore((state) => state.login)
+  const navigate = useNavigate()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (username.trim()) {
       login(username.trim())
+      navigate({ to: '/' })
     }
   }
 

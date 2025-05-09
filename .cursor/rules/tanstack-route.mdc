@@ -1,0 +1,1402 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+TITLE: Creating a Root Route and Router with TanStack Router
+DESCRIPTION: Example of creating a root route with the createRootRoute function, adding child routes to create a route tree, and then initializing a router. The root route includes a component that renders an Outlet component.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/createRootRouteFunction.md#2025-04-21_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { createRootRoute, createRouter, Outlet } from '@tanstack/react-router'
+
+const rootRoute = createRootRoute({
+  component: () => <Outlet />,
+  // ... root route options
+})
+
+const routeTree = rootRoute.addChildren([
+  // ... other routes
+])
+
+const router = createRouter({
+  routeTree,
+})
+```
+
+----------------------------------------
+
+TITLE: Creating Root Route Component
+DESCRIPTION: Implementation of the root route component with navigation links and router devtools.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/migrate-from-react-location.md#2025-04-21_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+import { createRootRoute, Outlet, Link } from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+
+export const Route = createRootRoute({
+  component: () => {
+    return (
+      <>
+        <div>
+          <Link to="/" activeOptions={{ exact: true }}>
+            Home
+          </Link>
+          <Link to="/posts">Posts</Link>
+        </div>
+        <hr />
+        <Outlet />
+        <TanStackRouterDevtools />
+      </>
+    )
+  },
+})
+```
+
+----------------------------------------
+
+TITLE: Implementing Protected Route with Authentication Check in TanStack Router
+DESCRIPTION: This snippet shows how to create a protected route that checks the authentication state before loading. It redirects unauthenticated users to a login page with a redirect parameter for post-login navigation.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/authenticated-routes.md#2025-04-21_snippet_5
+
+LANGUAGE: tsx
+CODE:
+```
+import { createFileRoute, redirect } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/dashboard')({
+  beforeLoad: ({ context, location }) => {
+    if (!context.auth.isAuthenticated) {
+      throw redirect({
+        to: '/login',
+        search: {
+          redirect: location.href,
+        },
+      })
+    }
+  },
+})
+```
+
+----------------------------------------
+
+TITLE: Representing Nested Routes in TanStack Router (Conceptual)
+DESCRIPTION: Illustrates a conceptual nested route hierarchy structure, showing how routes like /blog/posts/$postId map to a tree structure.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/routing/route-trees.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+├── blog
+│   ├── posts
+│   │   ├── $postId
+```
+
+----------------------------------------
+
+TITLE: First Route Implementation
+DESCRIPTION: Example route implementation with server functions and counter functionality
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/tanstack-start.md#2025-04-21_snippet_9
+
+LANGUAGE: tsx
+CODE:
+```
+// app/routes/index.tsx
+import * as fs from 'fs'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+
+const filePath = 'count.txt'
+
+async function readCount() {
+  return parseInt(
+    await fs.promises.readFile(filePath, 'utf-8').catch(() => '0'),
+  )
+}
+
+const getCount = createServerFn({
+  method: 'GET',
+}).handler(() => {
+  return readCount()
+})
+
+const updateCount = createServerFn({ method: 'POST' })
+  .validator((d: number) => d)
+  .handler(async ({ data }) => {
+    const count = await readCount()
+    await fs.promises.writeFile(filePath, `${count + data}`)
+  })
+
+export const Route = createFileRoute('/')({ 
+  component: Home,
+  loader: async () => await getCount(),
+})
+
+function Home() {
+  const router = useRouter()
+  const state = Route.useLoaderData()
+
+  return (
+    <button
+      onClick={() => {
+        updateCount({ data: 1 }).then(() => {
+          router.invalidate()
+        })
+      }}
+    >
+      Add 1 to {state}?
+    </button>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Defining Root Route Component (__root.tsx)
+DESCRIPTION: Creates the root route component using `createRootRoute`. This component typically includes shared layout elements like navigation links (`Link`), an `Outlet` for rendering child routes, and the router devtools. Requires `@tanstack/react-router` and `@tanstack/react-router-devtools`.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/quick-start.md#_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+
+export const Route = createRootRoute({
+  component: () => (
+    <>
+      <div className="p-2 flex gap-2">
+        <Link to="/" className="[&.active]:font-bold">
+          Home
+        </Link>{' '}
+        <Link to="/about" className="[&.active]:font-bold">
+          About
+        </Link>
+      </div>
+      <hr />
+      <Outlet />
+      <TanStackRouterDevtools />
+    </>
+  ),
+})
+```
+
+----------------------------------------
+
+TITLE: Using useSearch Hook in TanStack Router with TypeScript/TSX
+DESCRIPTION: Demonstrates different ways to use the useSearch hook in a React component, including strict mode with route-specific search params, selecting specific search parameters, and loose mode for accessing all search parameters.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/useSearchHook.md#2025-04-23_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { useSearch } from '@tanstack/react-router'
+
+function Component() {
+  const search = useSearch({ from: '/posts/$postId' })
+  //    ^ FullSearchSchema
+
+  // OR
+
+  const selected = useSearch({
+    from: '/posts/$postId',
+    select: (search) => search.postView,
+  })
+  //    ^ string
+
+  // OR
+
+  const looseSearch = useSearch({ strict: false })
+  //    ^ Partial<FullSearchSchema>
+
+  // ...
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring TanStack Router in Start Application
+DESCRIPTION: This code snippet shows how to set up the router.tsx file which configures TanStack Router functionality within a Start application. It enables scrollRestoration and exports a createRouter function that other parts of the application will use.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/start/framework/react/learn-the-basics.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+// app/router.tsx
+import { createRouter as createTanStackRouter } from '@tanstack/react-router'
+import { routeTree } from './routeTree.gen'
+
+export function createRouter() {
+  const router = createTanStackRouter({
+    routeTree,
+    scrollRestoration: true,
+  })
+
+  return router
+}
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: ReturnType<typeof createRouter>
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Routes Code-Based with TanStack Router (SolidJS)
+DESCRIPTION: This snippet demonstrates setting up a basic router configuration in SolidJS using TanStack Router. It defines a root route with navigation, child routes for the index and about pages, builds a route tree, creates the router instance, and renders the application using the RouterProvider. Requires `@tanstack/solid-router` and `solid-js`.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/solid/quick-start.md#_snippet_7
+
+LANGUAGE: tsx
+CODE:
+```
+import { render } from 'solid-js/web'
+import {
+  Outlet,
+  RouterProvider,
+  Link,
+  createRouter,
+  createRoute,
+  createRootRoute,
+} from '@tanstack/solid-router'
+import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools'
+
+const rootRoute = createRootRoute({
+  component: () => (
+    <>
+      <div class="p-2 flex gap-2">
+        <Link to="/" class="[&.active]:font-bold">
+          Home
+        </Link>{' '}
+        <Link to="/about" class="[&.active]:font-bold">
+          About
+        </Link>
+      </div>
+      <hr />
+      <Outlet />
+      <TanStackRouterDevtools />
+    </>
+  ),
+})
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: function Index() {
+    return (
+      <div class="p-2">
+        <h3>Welcome Home!</h3>
+      </div>
+    )
+  },
+})
+
+const aboutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/about',
+  component: function About() {
+    return <div class="p-2">Hello from About!</div>
+  },
+})
+
+const routeTree = rootRoute.addChildren([indexRoute, aboutRoute])
+
+const router = createRouter({ routeTree })
+
+declare module '@tanstack/solid-router' {
+  interface Register {
+    router: typeof router
+  }
+}
+
+const rootElement = document.getElementById('app')!
+if (!rootElement.innerHTML) {
+  render(() => <RouterProvider router={router} />, rootElement)
+}
+```
+
+----------------------------------------
+
+TITLE: Initializing TanStack Router with Router Class in React
+DESCRIPTION: Example demonstrating how to create a new Router instance and implement it with RouterProvider in a React application. The router is configured with a route tree and default preload setting of 'intent'.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/RouterClass.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Router, RouterProvider } from '@tanstack/react-router'
+import { routeTree } from './routeTree.gen'
+
+const router = new Router({
+  routeTree,
+  defaultPreload: 'intent',
+})
+
+export default function App() {
+  return <RouterProvider router={router} />
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Routes and Rendering App with TanStack Router
+DESCRIPTION: This snippet demonstrates a complete setup for a simple application using code-based route configuration in TanStack Router. It defines a root route with navigation links, creates index and about routes, builds the route tree, initializes the router, and renders the React application using the RouterProvider.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/quick-start.md#_snippet_7
+
+LANGUAGE: tsx
+CODE:
+```
+import { StrictMode } from 'react'
+import ReactDOM from 'react-dom/client'
+import {
+  Outlet,
+  RouterProvider,
+  Link,
+  createRouter,
+  createRoute,
+  createRootRoute,
+} from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+
+const rootRoute = createRootRoute({
+  component: () => (
+    <>
+      <div className="p-2 flex gap-2">
+        <Link to="/" className="[&.active]:font-bold">
+          Home
+        </Link>{' '}
+        <Link to="/about" className="[&.active]:font-bold">
+          About
+        </Link>
+      </div>
+      <hr />
+      <Outlet />
+      <TanStackRouterDevtools />
+    </>
+  ),
+})
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: function Index() {
+    return (
+      <div className="p-2">
+        <h3>Welcome Home!</h3>
+      </div>
+    )
+  },
+})
+
+const aboutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/about',
+  component: function About() {
+    return <div className="p-2">Hello from About!</div>
+  },
+})
+
+const routeTree = rootRoute.addChildren([indexRoute, aboutRoute])
+
+const router = createRouter({ routeTree })
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
+
+const rootElement = document.getElementById('app')!
+if (!rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement)
+  root.render(
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>,
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Creating a Router Instance in TanStack Router
+DESCRIPTION: This snippet demonstrates how to create a new Router instance using the createRouter function from TanStack Router.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/creating-a-router.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { createRouter } from '@tanstack/react-router'
+
+const router = createRouter({
+  // ...
+})
+```
+
+----------------------------------------
+
+TITLE: Defining Register Type Template in TypeScript
+DESCRIPTION: The basic template for the Register type that is used to register a route tree with a router instance. This type unlocks the full type safety features of TanStack Router.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/RegisterType.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+export type Register = {
+  // router: [Your router type here]
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Vite Plugin for TanStack Router
+DESCRIPTION: Shows how to import and add the `TanStackRouterVite` plugin to your Vite configuration file (`vite.config.ts`). It's crucial to place this plugin before the React plugin for proper functionality. Requires Vite and the `@tanstack/router-plugin` package.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/quick-start.md#_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+// vite.config.ts
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    // Please make sure that '@tanstack/router-plugin' is passed before '@vitejs/plugin-react'
+    TanStackRouterVite({ target: 'react', autoCodeSplitting: true }),
+    react(),
+    // ...,
+  ],
+})
+```
+
+----------------------------------------
+
+TITLE: Configuring Vite Plugin for TanStack Router
+DESCRIPTION: Installation and configuration of the TanStack Router Vite plugin for automatic route updates.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/migrate-from-react-location.md#2025-04-21_snippet_1
+
+LANGUAGE: sh
+CODE:
+```
+npm install -D @tanstack/router-plugin
+```
+
+LANGUAGE: javascript
+CODE:
+```
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+
+export default defineConfig({
+  // ...
+  plugins: [TanStackRouterVite(), react()],
+})
+```
+
+----------------------------------------
+
+TITLE: Implementing a Counter Route with Server Functions
+DESCRIPTION: Implementation of the index route with a persistent counter that uses server functions to read and update a count stored in a file, demonstrating data fetching and state invalidation.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/start/framework/react/build-from-scratch.md#2025-04-23_snippet_11
+
+LANGUAGE: tsx
+CODE:
+```
+// app/routes/index.tsx
+import * as fs from 'node:fs'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+
+const filePath = 'count.txt'
+
+async function readCount() {
+  return parseInt(
+    await fs.promises.readFile(filePath, 'utf-8').catch(() => '0'),
+  )
+}
+
+const getCount = createServerFn({
+  method: 'GET',
+}).handler(() => {
+  return readCount()
+})
+
+const updateCount = createServerFn({ method: 'POST' })
+  .validator((d: number) => d)
+  .handler(async ({ data }) => {
+    const count = await readCount()
+    await fs.promises.writeFile(filePath, `${count + data}`)
+  })
+
+export const Route = createFileRoute('/')({ 
+  component: Home,
+  loader: async () => await getCount(),
+})
+
+function Home() {
+  const router = useRouter()
+  const state = Route.useLoaderData()
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        updateCount({ data: 1 }).then(() => {
+          router.invalidate()
+        })
+      }}
+    >
+      Add 1 to {state}?
+    </button>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Basic Usage of useBlocker Hook in React
+DESCRIPTION: This example demonstrates the basic usage of the useBlocker hook in a React component. It blocks navigation when a form is dirty.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/useBlockerHook.md#2025-04-23_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { useBlocker } from '@tanstack/react-router'
+
+function MyComponent() {
+  const [formIsDirty, setFormIsDirty] = useState(false)
+
+  useBlocker({
+    shouldBlockFn: () => formIsDirty,
+  })
+
+  // ...
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Hook-Based Navigation Blocking in TanStack Router with SolidJS
+DESCRIPTION: This example demonstrates how to use the useBlocker hook from TanStack Router to prevent navigation when a form has unsaved changes. It uses a simple confirmation dialog to ask the user if they want to leave the page.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/solid/guide/navigation-blocking.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { useBlocker } from '@tanstack/solid-router'
+
+function MyComponent() {
+  const [formIsDirty, setFormIsDirty] = createSignal(false)
+
+  useBlocker({
+    shouldBlockFn: () => {
+      if (!formIsDirty()) return false
+
+      const shouldLeave = confirm('Are you sure you want to leave?')
+      return !shouldLeave
+    },
+  })
+
+  // ...
+}
+```
+
+----------------------------------------
+
+TITLE: Registering Router Types for TypeScript in TanStack Router
+DESCRIPTION: This code extends the Register interface to provide type safety for the router instance across the entire project using TypeScript's Declaration Merging.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/creating-a-router.md#2025-04-21_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+declare module '@tanstack/react-router' {
+  interface Register {
+    // This infers the type of our router and registers it across your entire project
+    router: typeof router
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Layout Routes with TanStack Router in TSX
+DESCRIPTION: Shows how to create layout routes that wrap child components in a layout component. Demonstrates creating parent and child routes with proper nesting structure.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/routing/code-based-routing.md#2025-04-21_snippet_9
+
+LANGUAGE: tsx
+CODE:
+```
+const postsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'posts',
+  component: PostsLayoutComponent, // The layout component
+})
+
+function PostsLayoutComponent() {
+  return (
+    <div>
+      <h1>Posts</h1>
+      <Outlet />
+    </div>
+  )
+}
+
+const postsIndexRoute = createRoute({
+  getParentRoute: () => postsRoute,
+  path: '/',
+})
+
+const postsCreateRoute = createRoute({
+  getParentRoute: () => postsRoute,
+  path: 'create',
+})
+
+const routeTree = rootRoute.addChildren([
+  // The postsRoute is the layout route
+  // Its children will be nested under the PostsLayoutComponent
+  postsRoute.addChildren([postsIndexRoute, postsCreateRoute]),
+])
+```
+
+----------------------------------------
+
+TITLE: Accessing Router Instance with useRouter Hook in React
+DESCRIPTION: This snippet demonstrates how to use the useRouter hook to obtain the current Router instance within a React component. The hook returns the Router object, which can be used to access router-related functionality.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/useRouterHook.md#2025-04-23_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { useRouter } from '@tanstack/react-router'
+
+function Component() {
+  const router = useRouter()
+  //    ^ Router
+
+  // ...
+}
+```
+
+----------------------------------------
+
+TITLE: Code-Based Splitting in TanStack Router
+DESCRIPTION: This snippet illustrates how to implement code-based splitting in TanStack Router using the createLazyRoute function and the .lazy method on route definitions.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/code-splitting.md#2025-04-21_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+// src/posts.tsx
+export const Route = createLazyRoute('/posts')({
+  component: MyComponent,
+})
+
+function MyComponent() {
+  return <div>My Component</div>
+}
+```
+
+LANGUAGE: tsx
+CODE:
+```
+// src/app.tsx
+const postsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/posts',
+}).lazy(() => import('./posts.lazy').then((d) => d.Route))
+```
+
+----------------------------------------
+
+TITLE: Creating Index Routes in TanStack Router
+DESCRIPTION: Demonstrates how to create index routes using a single slash '/' as the path, which will match the parent route's path directly.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/routing/code-based-routing.md#2025-04-21_snippet_5
+
+LANGUAGE: tsx
+CODE:
+```
+const postsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'posts',
+})
+
+const postsIndexRoute = createRoute({
+  getParentRoute: () => postsRoute,
+  // Notice the single slash `/` here
+  path: '/',
+})
+```
+
+----------------------------------------
+
+TITLE: Consuming Loader Data with useLoaderData Hook (TypeScript/React)
+DESCRIPTION: This example shows how to use the useLoaderData hook to access data returned by a route's loader function within a component.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/data-loading.md#2025-04-21_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+const posts = Route.useLoaderData()
+```
+
+----------------------------------------
+
+TITLE: Initializing and Rendering TanStack Router (main.tsx)
+DESCRIPTION: Imports the generated route tree (`routeTree.gen.ts`), creates a router instance, registers it for type safety, and renders the application using the `RouterProvider` within a React `StrictMode`. This is the entry point for the router in your application. Requires `@tanstack/react-router`, `react`, `react-dom`, and the generated `routeTree.gen.ts` file.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/quick-start.md#_snippet_6
+
+LANGUAGE: tsx
+CODE:
+```
+import { StrictMode } from 'react'
+import ReactDOM from 'react-dom/client'
+import { RouterProvider, createRouter } from '@tanstack/react-router'
+
+// Import the generated route tree
+import { routeTree } from './routeTree.gen'
+
+// Create a new router instance
+const router = createRouter({ routeTree })
+
+// Register the router instance for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
+
+// Render the app
+const rootElement = document.getElementById('root')!
+if (!rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement)
+  root.render(
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>,
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Using useNavigate Hook in React Components with TanStack Router
+DESCRIPTION: Demonstrates various ways to use the useNavigate hook in React components. It shows how to navigate to different routes, set search parameters, hash, and state using the navigate function.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/useNavigateHook.md#2025-04-23_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { useNavigate } from '@tanstack/react-router'
+
+function PostsPage() {
+  const navigate = useNavigate({ from: '/posts' })
+  const handleClick = () => navigate({ search: { page: 2 } })
+  // ...
+}
+
+function Component() {
+  const navigate = useNavigate()
+  return (
+    <div>
+      <button
+        onClick={() =>
+          navigate({
+            to: '/posts',
+          })
+        }
+      >
+        Posts
+      </button>
+      <button
+        onClick={() =>
+          navigate({
+            to: '/posts',
+            search: { page: 2 },
+          })
+        }
+      >
+        Posts (Page 2)
+      </button>
+      <button
+        onClick={() =>
+          navigate({
+            to: '/posts',
+            hash: 'my-hash',
+          })
+        }
+      >
+        Posts (Hash)
+      </button>
+      <button
+        onClick={() =>
+          navigate({
+            to: '/posts',
+            state: { from: 'home' },
+          })
+        }
+      >
+        Posts (State)
+      </button>
+    </div>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Using useLoaderData Hook in TanStack Router with TypeScript
+DESCRIPTION: This example demonstrates how to use the useLoaderData hook in a React component with TanStack Router. It shows the basic usage with the 'from' option to specify the route ID, providing type safety for the returned loader data.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/useLoaderDataHook.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { useLoaderData } from '@tanstack/react-router'
+
+function Component() {
+  const loaderData = useLoaderData({ from: '/posts/$postId' })
+  //     ^? { postId: string, body: string, ... }
+  // ...
+}
+```
+
+----------------------------------------
+
+TITLE: Installing TanStack Router Plugin for Vite
+DESCRIPTION: Command to install the TanStack Router plugin package for Vite using npm.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/routing/installation-with-vite.md#2025-04-21_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+npm install -D @tanstack/router-plugin
+```
+
+----------------------------------------
+
+TITLE: Creating a Route with the createRoute Function in React Router
+DESCRIPTION: This example demonstrates how to create a route using the createRoute function from TanStack Router. It creates a route with a path, loader function that returns data, and a component that displays that data using the useLoaderData hook.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/createRouteFunction.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { createRoute } from '@tanstack/react-router'
+import { rootRoute } from './__root'
+
+const Route = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  loader: () => {
+    return 'Hello World'
+  },
+  component: IndexComponent,
+})
+
+function IndexComponent() {
+  const data = Route.useLoaderData()
+  return <div>{data}</div>
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing useMatch Hook in TanStack Router
+DESCRIPTION: Type-safe version of useMatch hook pre-bound to a specific route ID. Supports selection and structural sharing options for optimized rendering.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/RouteApiType.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+  useMatch<TSelected = TAllContext>(opts?: {
+    select?: (match: TAllContext) => TSelected
+  }): TSelected
+```
+
+----------------------------------------
+
+TITLE: Installing TanStack Router CLI via npm
+DESCRIPTION: Command to install the @tanstack/router-cli package as a development dependency using npm.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/routing/installation-with-router-cli.md#2025-04-21_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+npm install -D @tanstack/router-cli
+```
+
+----------------------------------------
+
+TITLE: Responding with JSON using Response Object in TanStack React Start
+DESCRIPTION: Demonstrates how to return a JSON response from an API route using the standard `Response` constructor, manually setting the `Content-Type` header to `application/json` and stringifying the JSON payload.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/start/framework/react/api-routes.md#_snippet_6
+
+LANGUAGE: ts
+CODE:
+```
+// routes/api/hello.ts
+import { createAPIFileRoute } from '@tanstack/react-start/api'
+
+export const APIRoute = createAPIFileRoute('/api/hello')({
+  GET: async ({ request }) => {
+    return new Response(JSON.stringify({ message: 'Hello, World!' }), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  },
+})
+
+// Visit /api/hello to see the response
+// {"message":"Hello, World!"}
+```
+
+----------------------------------------
+
+TITLE: Using Exact Matching for Active Links in TanStack Router with TSX
+DESCRIPTION: Demonstrates how to create a link that is only active when there's an exact route match. This is useful for home page links that shouldn't be active on child routes.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/navigation.md#2025-04-21_snippet_14
+
+LANGUAGE: tsx
+CODE:
+```
+const link = (
+  <Link to="/" activeOptions={{ exact: true }}>
+    Home
+  </Link>
+)
+```
+
+----------------------------------------
+
+TITLE: Setting up TanStack Start API Entry Handler (TypeScript)
+DESCRIPTION: This code snippet demonstrates how to set up the main entry handler for TanStack Start API routes. It imports necessary functions from `@tanstack/react-start/api` and exports a handler created using `createStartAPIHandler` with the `defaultAPIFileRouteHandler`, which automatically routes requests based on file conventions.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/start/framework/react/api-routes.md#_snippet_0
+
+LANGUAGE: typescript
+CODE:
+```
+// app/api.ts
+import {
+  createStartAPIHandler,
+  defaultAPIFileRouteHandler,
+} from '@tanstack/react-start/api'
+
+export default createStartAPIHandler(defaultAPIFileRouteHandler)
+```
+
+----------------------------------------
+
+TITLE: Using Path Parameters in Route Loaders
+DESCRIPTION: Demonstrates how to access path parameters in a route loader function via the params property, which extracts values from dynamic segments in the URL path.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/data-loading.md#2025-04-21_snippet_13
+
+LANGUAGE: tsx
+CODE:
+```
+// routes/posts.$postId.tsx
+export const Route = createFileRoute('/posts/$postId')({
+  loader: ({ params: { postId } }) => fetchPostById(postId),
+})
+```
+
+----------------------------------------
+
+TITLE: Setting Up Server-Side Rendering Entry Point
+DESCRIPTION: Server entry point that creates a handler for server-side rendering using TanStack Start's built-in functionality and router integration.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/start/framework/react/build-from-scratch.md#2025-04-23_snippet_8
+
+LANGUAGE: tsx
+CODE:
+```
+// app/ssr.tsx
+import {
+  createStartHandler,
+  defaultStreamHandler,
+} from '@tanstack/react-start/server'
+import { getRouterManifest } from '@tanstack/react-start/router-manifest'
+
+import { createRouter } from './router'
+
+export default createStartHandler({
+  createRouter,
+  getRouterManifest,
+})(defaultStreamHandler)
+```
+
+----------------------------------------
+
+TITLE: Converting File Structure to Code-Based Routing in TanStack Router
+DESCRIPTION: Demonstrates how a file-based routing structure can be converted to equivalent code-based routing using createRootRoute and createRoute functions. Each route is defined with its parent relationship and path.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/routing/code-based-routing.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { createRootRoute, createRoute } from '@tanstack/react-router'
+
+const rootRoute = createRootRoute()
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+})
+
+const aboutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'about',
+})
+
+const postsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'posts',
+})
+
+const postsIndexRoute = createRoute({
+  getParentRoute: () => postsRoute,
+  path: '/',
+})
+
+const postRoute = createRoute({
+  getParentRoute: () => postsRoute,
+  path: '$postId',
+})
+
+const postEditorRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'posts/$postId/edit',
+})
+
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'settings',
+})
+
+const profileRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: 'profile',
+})
+
+const notificationsRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: 'notifications',
+})
+
+const pathlessLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: 'pathlessLayout',
+})
+
+const pathlessLayoutARoute = createRoute({
+  getParentRoute: () => pathlessLayoutRoute,
+  path: 'route-a',
+})
+
+const pathlessLayoutBRoute = createRoute({
+  getParentRoute: () => pathlessLayoutRoute,
+  path: 'route-b',
+})
+
+const filesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'files/$',
+})
+```
+
+----------------------------------------
+
+TITLE: Importing and Using NotFoundRoute Class in TanStack Router
+DESCRIPTION: This example demonstrates how to create a NotFoundRoute instance and pass it to the createRouter function as the notFoundRoute option. The NotFoundRoute is configured with a parent route and a component that renders when a route is not found.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/api/router/NotFoundRouteClass.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { NotFoundRoute, createRouter } from '@tanstack/react-router'
+import { Route as rootRoute } from './routes/__root'
+import { routeTree } from './routeTree.gen'
+
+const notFoundRoute = new NotFoundRoute({
+  getParentRoute: () => rootRoute,
+  component: () => <div>Not found!!!</div>,
+})
+
+const router = createRouter({
+  routeTree,
+  notFoundRoute,
+})
+
+// ... other code
+```
+
+----------------------------------------
+
+TITLE: Installing Basic TanStack Router Example
+DESCRIPTION: Commands to clone and run the basic TanStack Router example project using gitpick, including installation and development server startup.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/start/framework/react/quick-start.md#2025-04-21_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npx gitpick TanStack/router/tree/main/examples/react/start-basic start-basic
+cd start-basic
+npm install
+npm run dev
+```
+
+----------------------------------------
+
+TITLE: Configuring SSR Handler in TanStack Router
+DESCRIPTION: Creates a server-side rendering handler using TanStack Start. The handler is configured with a router creation function and router manifest, enabling streaming of rendered HTML to the client. This setup is essential for implementing SSR functionality in TanStack applications.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/start/framework/react/ssr.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import {
+  createStartHandler,
+  defaultStreamHandler,
+} from '@tanstack/react-start/server'
+import { getRouterManifest } from '@tanstack/react-start/router-manifest'
+
+import { createRouter } from './router'
+
+export default createStartHandler({
+  createRouter,
+  getRouterManifest,
+})(defaultStreamHandler)
+```
+
+----------------------------------------
+
+TITLE: TanStack Query Integration with Route Loader (TypeScript/TSX)
+DESCRIPTION: A realistic example of integrating TanStack Query with TanStack Router. It demonstrates how to use the loader to ensure data is loaded and how to read the data from the cache in the component.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/external-data-loading.md#2025-04-21_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+// src/routes/posts.tsx
+const postsQueryOptions = queryOptions({
+  queryKey: ['posts'],
+  queryFn: () => fetchPosts(),
+})
+
+export const Route = createFileRoute('/posts')({
+  // Use the `loader` option to ensure that the data is loaded
+  loader: () => queryClient.ensureQueryData(postsQueryOptions),
+  component: () => {
+    // Read the data from the cache and subscribe to updates
+    const {
+      data: { posts },
+    } = useSuspenseQuery(postsQueryOptions)
+
+    return (
+      <div>
+        {posts.map((post) => (
+          <Post key={post.id} post={post} />
+        ))}
+      </div>
+    )
+  },
+})
+```
+
+----------------------------------------
+
+TITLE: Accessing Search Params in Route Components
+DESCRIPTION: Example of using the useSearch hook to access validated search parameters within a route component.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/search-params.md#2025-04-21_snippet_13
+
+LANGUAGE: tsx
+CODE:
+```
+// /routes/shop.products.tsx
+
+export const Route = createFileRoute('/shop/products')({  
+  validateSearch: productSearchSchema,
+})
+
+const ProductList = () => {
+  const { page, filter, sort } = Route.useSearch()
+
+  return <div>...</div>
+}
+```
+
+----------------------------------------
+
+TITLE: Using Abort Signal with Loader in TanStack Router (TSX)
+DESCRIPTION: Demonstrates how to use the abortController property in a loader function to cancel network requests when a route is unloaded or params change.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/data-loading.md#2025-04-21_snippet_17
+
+LANGUAGE: tsx
+CODE:
+```
+export const Route = createFileRoute('/posts')({\n  loader: ({ abortController }) =>\n    fetchPosts({\n      // Pass this to an underlying fetch call or anything that supports signals\n      signal: abortController.signal,\n    }),\n})
+```
+
+----------------------------------------
+
+TITLE: Accessing Route API in Separate Component File
+DESCRIPTION: Demonstrates how to use getRouteApi to access route APIs in a separate component file, specifically showing how to access loader data with type safety.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/code-splitting.md#2025-04-21_snippet_5
+
+LANGUAGE: tsx
+CODE:
+```
+import { getRouteApi } from '@tanstack/react-router'
+
+const route = getRouteApi('/my-route')
+
+export function MyComponent() {
+  const loaderData = route.useLoaderData()
+  //    ^? { foo: string }
+
+  return <div>...</div>
+}
+```
+
+----------------------------------------
+
+TITLE: Using Type-Safe Hooks in Route Components with TypeScript
+DESCRIPTION: Illustrates how to use type-safe hooks within a route component, including those that require context hints.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/type-safety.md#2025-04-21_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+export const Route = createFileRoute('/posts')({
+  component: PostsComponent,
+})
+
+function PostsComponent() {
+  // Each route has type-safe versions of most of the built-in hooks from TanStack Router
+  const params = Route.useParams()
+  const search = Route.useSearch()
+
+  // Some hooks require context from the *entire* router, not just the current route. To achieve type-safety here,
+  // we must pass the `from` param to tell the hook our relative position in the route hierarchy.
+  const navigate = useNavigate({ from: Route.fullPath })
+  // ... etc
+}
+```
+
+----------------------------------------
+
+TITLE: Installing and Running TanStack Router in Development Mode
+DESCRIPTION: Commands for installing dependencies and starting the TanStack Router application in development mode. This rebuilds assets automatically when files are changed.
+SOURCE: https://github.com/tanstack/router/blob/main/examples/react/start-basic/README.md#2025-04-21_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+pnpm install
+pnpm dev
+```
+
+----------------------------------------
+
+TITLE: Defining a Route Loader in TanStack Router (TypeScript/React)
+DESCRIPTION: This snippet demonstrates how to create a basic route loader function for a '/posts' route. The loader fetches posts data when the route is loaded.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/guide/data-loading.md#2025-04-21_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+// routes/posts.tsx
+export const Route = createFileRoute('/posts')({
+  loader: () => fetchPosts(),
+})
+```
+
+----------------------------------------
+
+TITLE: Implementing Authentication in Pathless Layout Routes with TanStack Router
+DESCRIPTION: This code snippet demonstrates how to create a pathless layout route with authentication checks. It uses the beforeLoad hook to verify if a user is authenticated and redirects to the login page if not, otherwise rendering the protected content through an Outlet component.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/faq.md#2025-04-23_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+// src/routes/_pathless-layout.tsx
+import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { isAuthenticated } from '../utils/auth'
+
+export const Route = createFileRoute('/_pathless-layout', {
+  beforeLoad: async () => {
+    // Check if the user is authenticated
+    const authed = await isAuthenticated()
+    if (!authed) {
+      // Redirect the user to the login page
+      return '/login'
+    }
+  },
+  component: PathlessLayoutRouteComponent,
+  // ...
+})
+
+function PathlessLayoutRouteComponent() {
+  return (
+    <div>
+      <h1>You are authed</h1>
+      <Outlet />
+    </div>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Using Dynamic Route Segments in TanStack Router (TSX)
+DESCRIPTION: Shows how to define routes with dynamic segments using `$` (e.g., `/posts/$postId`). It demonstrates accessing the captured parameters (`params`) within a loader function and a component using `Route.useParams()` to retrieve the dynamic part of the URL.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/router/framework/react/routing/routing-concepts.md#_snippet_4
+
+LANGUAGE: tsx
+CODE:
+```
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/posts/$postId')({
+  // In a loader
+  loader: ({ params }) => fetchPost(params.postId),
+  // Or in a component
+  component: PostComponent,
+})
+
+function PostComponent() {
+  // In a component!
+  const { postId } = Route.useParams()
+  return <div>Post ID: {postId}</div>
+}
+```
+
+----------------------------------------
+
+TITLE: Defining API Route with Multiple Dynamic Path Parameters in TanStack Router (TypeScript)
+DESCRIPTION: Shows how to define an API route with multiple dynamic parameters (e.g., `$id` and `$postId`). It demonstrates accessing both parameter values from the `params` object within the handler.
+SOURCE: https://github.com/tanstack/router/blob/main/docs/start/framework/react/api-routes.md#_snippet_3
+
+LANGUAGE: TypeScript
+CODE:
+```
+// routes/api/users/$id/posts/$postId.ts
+import { createAPIFileRoute } from '@tanstack/react-start/api'
+
+export const APIRoute = createAPIFileRoute('/users/$id/posts/$postId')({
+  GET: async ({ params }) => {
+    const { id, postId } = params
+    return new Response(`User ID: ${id}, Post ID: ${postId}`)
+  },
+})
+```
