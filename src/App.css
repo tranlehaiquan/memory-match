@@ -1,0 +1,24 @@
+.app {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #646cff;
+  margin-bottom: 1rem;
+}
+
+.game-container {
+  width: 100%;
+  max-width: 800px;
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+} 
